@@ -42,5 +42,5 @@ Ellipsis-Extension is open-source software licensed under the [MIT license][mit-
 [bats]:         https://github.com/sstephenson/bats
 [issues]:       http://github.com/ellipsis/ellipsis-extension/issues
 
-[contrubutors]: https://github.com/ellipsis/ellipsis-extension/graphs/contributors
+[contributors]: https://github.com/ellipsis/ellipsis-extension/graphs/contributors
 [mit-license]:  http://opensource.org/licenses/MIT
