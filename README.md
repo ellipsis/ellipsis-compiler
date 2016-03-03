@@ -8,7 +8,15 @@ development.
 
 ### Usage
 
-TODO
+Getting started takes 4 steps:
+
+- Get the code
+- Run the init script (`./init.sh <extension-name>`)
+- Push to github
+- Activate Travis and ReadTheDocs for your extension
+
+*Currently only official extensions are support by the init script.*
+*Please contact us for more information!*
 
 ### Docs
 Please consult the [docs][docs-url] for more information.
