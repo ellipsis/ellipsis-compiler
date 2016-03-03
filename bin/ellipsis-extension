@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+##############################################################################
+
+ELLIPSIS_XBIN="${BASH_SOURCE[0]}"
+
+# Unlink script location
+loopcount=0
+while [ $loopcount -lt 1000 ]
+do
+    # Avoid infinit loops
+    let loopcount=loopcount+1
+
+    # If still a link, unlink, else break the loop
+    if [ -L "$ELLIPSIS_XBIN" ]; then
+        ELLIPSIS_XBIN="$(readlink "$ELLIPSIS_XBIN")"
+    else
+        break
+    fi
+done
+
+# Set PATH vars
+ELLIPSIS_PATH="${ELLIPSIS_PATH:-$(cd "$(dirname "$ELLIPSIS_XBIN")/../../.." && pwd)}"
+ELLIPSIS_SRC="$ELLIPSIS_PATH/src"
+ELLIPSIS_XPATH="$(cd "$(dirname "$ELLIPSIS_XBIN")/.." && pwd)"
+ELLIPSIS_XSRC="$ELLIPSIS_XPATH/src"
+
+##############################################################################
+
+# Provides load function and global vars
+source "$ELLIPSIS_XSRC/init.bash"
+
+load cli
+cli.run "$@"
+
+##############################################################################
