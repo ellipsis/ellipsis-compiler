@@ -24,12 +24,13 @@ sed_string="s/__name__/$name/g;\
     s/__name_l__/$name_lower/g;\
     s/__name_c__/$name_capital/g;"
 
-sed -i "$sed_string" ellipsis.sh README.md Makefile docs/* bin/* src/* test/*
+sed -i "$sed_string" ellipsis.sh XREADME.md Makefile docs/* bin/* src/* test/*
 
 ##############################################################################
 # File setup and cleanup
 
 mv bin/ellipsis-extension "bin/ellipsis-$name_lower"
+mv XREADME.md README.md
 
 rm "${BASH_SOURCE[0]}"
 
