@@ -19,8 +19,7 @@ Usage: ellipsis-__name_l__ <command>
     -h, --help     show help
     -v, --version  show version
 
-  Commands:
-"
+  Commands:"
 }
 
 ##############################################################################

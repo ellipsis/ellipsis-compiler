@@ -10,7 +10,7 @@ export TESTS_DIR="$BATS_TEST_DIRNAME"
 export ELLIPSIS_PATH="$(cd "$TESTS_DIR/../deps/ellipsis" && pwd)"
 export ELLIPSIS_SRC="$ELLIPSIS_PATH/src"
 export ELLIPSIS_XPATH="$(cd "$TESTS_DIR/.." && pwd)"
-export ELLIPSIS_XSRC="$TPM_PATH/src"
+export ELLIPSIS_XSRC="$ELLIPSIS_XPATH/src"
 export PATH="$ELLIPSIS_XPATH/bin:$PATH"
 
 export ELLIPSIS_LOGFILE="/dev/null"

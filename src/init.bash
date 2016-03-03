@@ -15,7 +15,7 @@ load() {
         eval "$loaded=1"
 
         # Load extension specific sources if possible
-        if [ -n "$ELLIPSIS_XSRC" && -f "$ELLIPSIS_XSRC/$1.bash" ]; then
+        if [ -n "$ELLIPSIS_XSRC" -a -f "$ELLIPSIS_XSRC/$1.bash" ]; then
             source "$ELLIPSIS_XSRC/$1.bash"
         else
             source "$ELLIPSIS_SRC/$1.bash"
