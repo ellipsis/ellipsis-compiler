@@ -1,6 +1,7 @@
 # Ellipsis-Extension [![Build Status][travis-image]][travis-url] [![Documentation status][docs-image]][docs-url] [![Latest tag][tag-image]][tag-url] [![Gitter chat][gitter-image]][gitter-url]
 
-TODO
+Ellipsis-Extension is a template to assist in [Ellipsis][ellipsis] extension
+development.
 
 ### Features
 - Easy and fast extension development!
@@ -11,9 +12,6 @@ TODO
 
 ### Docs
 Please consult the [docs][docs-url] for more information.
-
-Specific parts that could be off interest:
-- ...
 
 ### Development
 Pull requests welcome! New code should follow the [existing style][style-guide]
