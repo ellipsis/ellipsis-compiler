@@ -18,11 +18,11 @@ export ELLIPSIS_LOGFILE="/dev/null"
 ##############################################################################
 
 # Initialize ellipsis-__name_l__, which replaces bat's `load` function with ours.
-load ../src/init
+load "$ELLIPSIS_SRC/init.bash"
 
 ##############################################################################
 
-load vars
+load version
 load extension
 
 # Updated ellipsis version if not sufficient (make can't auto update)

@@ -27,7 +27,7 @@ ELLIPSIS_XSRC="$ELLIPSIS_XPATH/src"
 ##############################################################################
 
 # Provides load function and global vars
-source "$ELLIPSIS_XSRC/init.bash"
+source "$ELLIPSIS_SRC/init.bash"
 
 load cli
 cli.run "$@"
