@@ -6,6 +6,12 @@
 #
 ##############################################################################
 
+# Provide extension name
+export ELLIPSIS_XNAME="__name__"
+export ELLIPSIS_XNAME_U="$(tr '[a-z]' '[A-Z]' <<< "$ELLIPSIS_XNAME")"
+export ELLIPSIS_XNAME_L="$(tr '[A-Z]' '[a-z]' <<< "$ELLIPSIS_XNAME")"
+
+# Set path vars
 export TESTS_DIR="$BATS_TEST_DIRNAME"
 export ELLIPSIS_PATH="$(cd "$TESTS_DIR/../deps/ellipsis" && pwd)"
 export ELLIPSIS_SRC="$ELLIPSIS_PATH/src"
@@ -13,11 +19,12 @@ export ELLIPSIS_XPATH="$(cd "$TESTS_DIR/.." && pwd)"
 export ELLIPSIS_XSRC="$ELLIPSIS_XPATH/src"
 export PATH="$ELLIPSIS_XPATH/bin:$PATH"
 
+# Don't log tests
 export ELLIPSIS_LOGFILE="/dev/null"
 
 ##############################################################################
 
-# Initialize ellipsis-__name_l__, which replaces bat's `load` function with ours.
+# Init ellipsis, which replaces bat's `load` function with ours.
 load "$ELLIPSIS_SRC/init.bash"
 
 ##############################################################################

@@ -14,7 +14,7 @@ load git
 # prints usage
 cli.usage() {
 msg.print "\
-Usage: ellipsis-__name_l__ <command>
+Usage: ellipsis-$ELLIPSIS_XNAME_L <command>
   Options:
     -h, --help     show help
     -v, --version  show version
@@ -40,7 +40,7 @@ cli.version() {
 cli.run() {
     # Check if Ellipsis version is sufficient
     if ! extension.is_compatible; then
-        log.fail "Ellipsis-__name__ v$ELLIPSIS_XVERSION needs at least Ellipsis v$ELLIPSIS_VERSION_DEP"
+        log.fail "Ellipsis-$ELLIPSIS_XNAME v$ELLIPSIS_XVERSION needs at least Ellipsis v$ELLIPSIS_VERSION_DEP"
         msg.print "Please update Ellipsis!"
         exit 1
     fi
@@ -54,7 +54,7 @@ cli.run() {
             ;;
         *)
             if [ $# -gt 0 ]; then
-                msg.print "ellipsis-__name_l__: invalid command -- $1"
+                msg.print "ellipsis-$ELLIPSIS_XNAME_L: invalid command -- $1"
             fi
             cli.usage
             return 1
