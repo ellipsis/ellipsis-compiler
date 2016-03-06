@@ -17,10 +17,13 @@ export ELLIPSIS_PATH="$(cd "$TESTS_DIR/../deps/ellipsis" && pwd)"
 export ELLIPSIS_SRC="$ELLIPSIS_PATH/src"
 export ELLIPSIS_XPATH="$(cd "$TESTS_DIR/.." && pwd)"
 export ELLIPSIS_XSRC="$ELLIPSIS_XPATH/src"
-export PATH="$ELLIPSIS_XPATH/bin:$PATH"
+export PATH="$ELLIPSIS_PATH/bin:$PATH"
 
 # Don't log tests
 export ELLIPSIS_LOGFILE="/dev/null"
+
+# Reset nesting level
+export ELLIPSIS_LVL=0
 
 ##############################################################################
 
