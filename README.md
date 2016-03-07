@@ -36,7 +36,7 @@ Ellipsis-Extension is open-source software licensed under the [MIT license][mit-
 [travis-image]: https://img.shields.io/travis/ellipsis/ellipsis-extension.svg
 [travis-url]:   https://travis-ci.org/ellipsis/ellipsis-extension
 [docs-image]:   https://readthedocs.org/projects/ellipsis/badge/?version=master
-[docs-url]:     http://ellipsis.readthedocs.org/en/master/extensions
+[docs-url]:     http://docs.ellipsis.sh/extensions
 [tag-image]:    https://img.shields.io/github/tag/ellipsis/ellipsis-extension.svg
 [tag-url]:      https://github.com/ellipsis/ellipsis-extension/tags
 [gitter-image]: https://badges.gitter.im/ellipsis/ellipsis.svg
