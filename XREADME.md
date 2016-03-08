@@ -57,5 +57,5 @@ Ellipsis-__name__ is open-source software licensed under the [MIT license][mit-l
 [bats]:         https://github.com/sstephenson/bats
 [issues]:       http://github.com/ellipsis/ellipsis-__name_l__/issues
 
-[contrubutors]: https://github.com/ellipsis/ellipsis-__name_l__/graphs/contributors
+[contributors]: https://github.com/ellipsis/ellipsis-__name_l__/graphs/contributors
 [mit-license]:  http://opensource.org/licenses/MIT
