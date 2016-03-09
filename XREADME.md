@@ -27,7 +27,7 @@ TODO
 ### Docs
 Please consult the [docs][docs-url] for more information.
 
-specific parts that could be off interest:
+Specific parts that could be off interest:
 - ...
 
 ### Development

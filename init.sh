@@ -24,7 +24,7 @@ sed_string="s/__name__/$name/g;\
     s/__name_l__/$name_lower/g;\
     s/__name_c__/$name_capital/g;"
 
-sed -i "$sed_string" ellipsis.sh XREADME.md Makefile test/_helper.bash bin/ellipsis-extension docs/*
+sed -i "$sed_string" ellipsis.sh XREADME.md Makefile mkdocs.yml test/_helper.bash bin/ellipsis-extension docs/*
 
 ##############################################################################
 # File setup and cleanup
