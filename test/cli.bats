@@ -54,4 +54,12 @@ load cli
     [ $(expr "$output" : "v[0-9][0-9.]*") -ne 0 ]
 }
 
+@test "cli.run fails if Ellipsis version is not sufficient" {
+    ELLIPSIS_VERSION="1.4.7"\
+    run cli.run
+    [ "$status" -eq 1 ]
+    [ "${lines[0]}" = "[FAIL] Ellipsis-$ELLIPSIS_XNAME v$ELLIPSIS_XVERSION needs at least Ellipsis v$ELLIPSIS_VERSION_DEP" ]
+    [ "${lines[1]}" = "Please update Ellipsis!" ]
+}
+
 ##############################################################################
