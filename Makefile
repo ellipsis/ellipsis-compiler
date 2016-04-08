@@ -8,7 +8,9 @@ all: test
 ##############################################################################
 
 tag:
-	@sed -i '' -e 's/^ELLIPSIS_XVERSION=.*$$/ELLIPSIS_XVERSION="$(version)"/' src/version.bash
+	@sed -e 's/^ELLIPSIS_XVERSION=.*$$/ELLIPSIS_XVERSION="$(version)"/'\
+		src/version.bash > src/version.bash.tmp &&\
+		mv src/version.bash.tmp src/version.bash
 	@git add src/version.bash
 	@git commit -m v$(version)
 	@git tag v$(version)
