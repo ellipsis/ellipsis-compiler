@@ -37,7 +37,7 @@ Pull requests welcome! New code should follow the [existing style][style-guide]
 Suggest a feature or report a bug? Create an [issue][issues]!
 
 ### Author(s)
-You can thank all [these][contributors] people for all there hard work.
+You can thank [these][contributors] people for all there hard work.
 
 ### License
 Ellipsis-__name__ is open-source software licensed under the [MIT license][mit-license].
