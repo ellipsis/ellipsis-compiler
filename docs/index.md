@@ -1,4 +1,4 @@
-<h1>Ellipsis-__name__</h1>
+<h1>Ellipsis-compiler</h1>
 
 TODO
 

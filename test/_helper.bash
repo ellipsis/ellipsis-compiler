@@ -7,7 +7,7 @@
 ##############################################################################
 
 # Provide extension name
-export ELLIPSIS_XNAME="__name__"
+export ELLIPSIS_XNAME="compiler"
 export ELLIPSIS_XNAME_U="$(tr '[a-z]' '[A-Z]' <<< "$ELLIPSIS_XNAME")"
 export ELLIPSIS_XNAME_L="$(tr '[A-Z]' '[a-z]' <<< "$ELLIPSIS_XNAME")"
 

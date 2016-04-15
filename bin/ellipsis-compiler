@@ -2,7 +2,7 @@
 ##############################################################################
 
 # Provide extension name
-ELLIPSIS_XNAME="__name__"
+ELLIPSIS_XNAME="compiler"
 ELLIPSIS_XNAME_U="$(tr '[a-z]' '[A-Z]' <<< "$ELLIPSIS_XNAME")"
 ELLIPSIS_XNAME_L="$(tr '[A-Z]' '[a-z]' <<< "$ELLIPSIS_XNAME")"
 

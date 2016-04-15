@@ -1,5 +1,5 @@
 #
-# ellipsis-__name_l__ - shell script package manager
+# ellipsis-compiler - shell script package manager
 #
 ##############################################################################
 
