@@ -8,18 +8,17 @@ load extension
 load msg
 load log
 load git
+load compiler
 
 ##############################################################################
 
 # prints usage
 cli.usage() {
 msg.print "\
-Usage: ellipsis-$ELLIPSIS_XNAME_L <command>
+Usage: ellipsis-$ELLIPSIS_XNAME_L <files>
   Options:
     -h, --help     show help
-    -v, --version  show version
-
-  Commands:"
+    -v, --version  show version"
 }
 
 ##############################################################################
@@ -54,10 +53,11 @@ cli.run() {
             ;;
         *)
             if [ $# -gt 0 ]; then
-                msg.print "ellipsis-$ELLIPSIS_XNAME_L: invalid command -- $1"
+                compiler.compile "$@"
+            else
+                cli.usage
+                return 1
             fi
-            cli.usage
-            return 1
             ;;
     esac
 }
