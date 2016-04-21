@@ -59,8 +59,23 @@ compiler.parse_file() {
 
 ##############################################################################
 
+compiler.get_condition() {
+    # @TODO: implement
+    :
+}
+
+##############################################################################
+
+compiler.eval_condition() {
+    # @TODO: implement
+    echo "1"
+}
+
+##############################################################################
+
 compiler.parse_if() {
     output="$1"
+    local ignore_else=0
 
     while read line; do
         compiler.parse_line "$line"
@@ -68,12 +83,15 @@ compiler.parse_if() {
 
         if [ "$ret" -eq 1 ]; then
             return
-        elif [ "$ret" -eq 2 ]; then
+        elif [ "$ret" -eq 2 -a "$ignore_else" -eq 0 ]; then
             if [ "$output" -eq 1 ]; then
                 output=0
             else
                 output=1
             fi
+        elif [ "$ret" -eq 3 ]; then
+            output=0
+            ignore_else=1
         fi
     done
 
@@ -107,10 +125,20 @@ compiler.parse_line() {
                 compiler.include_raw "$inc_file"
                 ;;
             if)
-                compiler.parse_if 1
+                local condition="$(compiler.get_condition)"
+                compiler.parse_if "$(compiler.eval_condition $condition)"
                 ;;
             else)
                 return 2
+                ;;
+            elif)
+                if [ "$output" -eq 1 ]; then
+                    return 3
+                else
+                    local condition="$(compiler.get_condition)"
+                    compiler.parse_if "$(compiler.eval_condition $condition)"
+                    return 1
+                fi
                 ;;
             fi)
                 return 1
