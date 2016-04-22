@@ -64,11 +64,19 @@ compiler.parse_file() {
 
 ##############################################################################
 
+compiler.get_var() {
+    local cmd="$1"
+    local sed_string="s/^$EC_COMMENT$EC_PROMPT def_var//"
+
+    sed "$sed_string" <<< "$cmd"
+}
+
+##############################################################################
+
 compiler.get_condition() {
     # @TODO: implement
     :
     local cmd="$1"
-    local sed_string=""
     local sed_string="s/^$EC_COMMENT$EC_PROMPT if//;\
                       s/^$EC_COMMENT$EC_PROMPT elif//;\
                       s/; then//"
@@ -79,7 +87,7 @@ compiler.get_condition() {
 ##############################################################################
 
 compiler.eval_condition() {
-    if $1; then
+    if eval "$1"; then
         echo "1"
     else
         echo "0"
@@ -138,6 +146,10 @@ compiler.parse_line() {
                 local inc_file="$(cut -d ' ' -f3 <<< "$line")"
 
                 compiler.include_raw "$inc_file"
+                ;;
+            def_var)
+                local var="$(compiler.get_var "$line")"
+                eval "$var"
                 ;;
             if)
                 local condition="$(compiler.get_condition "$line")"
