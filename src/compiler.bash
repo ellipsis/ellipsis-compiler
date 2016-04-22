@@ -13,6 +13,11 @@ EC_COMMENT="${EC_COMMENT:-"#"}"
 EC_PROMPT="${EC_PROMPT:-"->$"}"
 EC_OUTPUT="tmp.file"
 
+# Return codes used by line parser
+EC_KEY_FI=10
+EC_KEY_ELSE=11
+EC_KEY_ELIF=12
+
 ##############################################################################
 
 compiler.print_error() {
@@ -62,13 +67,23 @@ compiler.parse_file() {
 compiler.get_condition() {
     # @TODO: implement
     :
+    local cmd="$1"
+    local sed_string=""
+    local sed_string="s/^$EC_COMMENT$EC_PROMPT if//;\
+                      s/^$EC_COMMENT$EC_PROMPT elif//;\
+                      s/; then//"
+
+    sed "$sed_string" <<< "$cmd"
 }
 
 ##############################################################################
 
 compiler.eval_condition() {
-    # @TODO: implement
-    echo "1"
+    if $1; then
+        echo "1"
+    else
+        echo "0"
+    fi
 }
 
 ##############################################################################
@@ -81,15 +96,15 @@ compiler.parse_if() {
         compiler.parse_line "$line"
         local ret="$?"
 
-        if [ "$ret" -eq 1 ]; then
+        if [ "$ret" -eq "$EC_KEY_FI" ]; then
             return
-        elif [ "$ret" -eq 2 -a "$ignore_else" -eq 0 ]; then
+        elif [ "$ret" -eq "$EC_KEY_ELSE" -a "$ignore_else" -eq 0 ]; then
             if [ "$output" -eq 1 ]; then
                 output=0
             else
                 output=1
             fi
-        elif [ "$ret" -eq 3 ]; then
+        elif [ "$ret" -eq "$EC_KEY_ELIF" ]; then
             output=0
             ignore_else=1
         fi
@@ -125,23 +140,23 @@ compiler.parse_line() {
                 compiler.include_raw "$inc_file"
                 ;;
             if)
-                local condition="$(compiler.get_condition)"
-                compiler.parse_if "$(compiler.eval_condition $condition)"
+                local condition="$(compiler.get_condition "$line")"
+                compiler.parse_if "$(compiler.eval_condition "$condition")"
                 ;;
             else)
-                return 2
+                return "$EC_KEY_ELSE"
                 ;;
             elif)
                 if [ "$output" -eq 1 ]; then
-                    return 3
+                    return "$EC_KEY_ELIF"
                 else
-                    local condition="$(compiler.get_condition)"
-                    compiler.parse_if "$(compiler.eval_condition $condition)"
-                    return 1
+                    local condition="$(compiler.get_condition "$line")"
+                    compiler.parse_if "$(compiler.eval_condition "$condition")"
+                    return "$EC_KEY_FI"
                 fi
                 ;;
             fi)
-                return 1
+                return "$EC_KEY_FI"
                 ;;
             *)
                 compiler.print_error
