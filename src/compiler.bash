@@ -11,7 +11,12 @@ load log
 
 EC_COMMENT="${EC_COMMENT:-"#"}"
 EC_PROMPT="${EC_PROMPT:-"->$"}"
-EC_OUTPUT="tmp.file"
+
+##############################################################################
+
+compiler.strip_extension() {
+    echo "${1%.ec}"
+}
 
 # Return codes used by line parser
 EC_KEY_FI=10
@@ -36,8 +41,9 @@ compiler.get_keyword() {
 
 compiler.compile() {
     for file in $@; do
+        local target="$(compiler.strip_extension "$file")"
         msg.bold "Compiling $file"
-        echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$EC_OUTPUT"
+        echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
         compiler.parse_file "$file"
     done
 }
@@ -180,14 +186,14 @@ compiler.parse_line() {
         # Ignore commented and empty lines
         :
     elif [ "$output" -eq 1 ]; then
-        echo "$line" >> "$EC_OUTPUT"
+        echo "$line" >> "$target"
     fi
 }
 
 ##############################################################################
 
 compiler.include_raw() {
-    cat "$1" >> "$EC_OUTPUT"
+    cat "$1" >> "$target"
 }
 
 ##############################################################################
