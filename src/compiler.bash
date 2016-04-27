@@ -14,10 +14,6 @@ EC_PROMPT="${EC_PROMPT:-"->$"}"
 
 ##############################################################################
 
-compiler.strip_extension() {
-    echo "${1%.ec}"
-}
-
 # Return codes used by line parser
 EC_KEY_FI=10
 EC_KEY_ELSE=11
@@ -40,12 +36,16 @@ compiler.get_keyword() {
 ##############################################################################
 
 compiler.compile() {
-    for file in $@; do
-        local target="$(compiler.strip_extension "$file")"
-        msg.bold "Compiling $file"
-        echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
-        compiler.parse_file "$file"
-    done
+    local file="$1"
+    if [ -z "$file" ]; then
+        msg.print "Please provide an input file"
+        exit 1
+    fi
+
+    local target="${2:-${file}.out}"
+    msg.bold "Compiling $file"
+    echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
+    compiler.parse_file "$file"
 }
 
 ##############################################################################
