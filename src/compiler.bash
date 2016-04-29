@@ -15,9 +15,9 @@ EC_PROMPT="${EC_PROMPT:-"->$"}"
 ##############################################################################
 
 # Return codes used by line parser
-EC_KEY_FI=10
-EC_KEY_ELSE=11
-EC_KEY_ELIF=12
+EC_KW_FI=10
+EC_KW_ELSE=11
+EC_KW_ELIF=12
 
 ##############################################################################
 
@@ -29,8 +29,7 @@ compiler.print_error() {
 ##############################################################################
 
 compiler.get_keyword() {
-    local line="$1"
-    cut -d ' ' -f2 <<< "$line"
+    cut -d ' ' -f2 <<< "$1"
 }
 
 ##############################################################################
@@ -70,6 +69,13 @@ compiler.parse_file() {
 
 ##############################################################################
 
+#@TODO optionaly strip comments (toglable for all output)
+compiler.include_raw() {
+    cat "$1" >> "$target"
+}
+
+##############################################################################
+
 compiler.get_var() {
     local cmd="$1"
     local sed_string="s/^$EC_COMMENT$EC_PROMPT def_var//"
@@ -105,15 +111,15 @@ compiler.parse_if() {
         compiler.parse_line "$line"
         local ret="$?"
 
-        if [ "$ret" -eq "$EC_KEY_FI" ]; then
+        if [ "$ret" -eq "$EC_KW_FI" ]; then
             return
-        elif [ "$ret" -eq "$EC_KEY_ELSE" -a "$ignore_else" -eq 0 ]; then
+        elif [ "$ret" -eq "$EC_KW_ELSE" -a "$ignore_else" -eq 0 ]; then
             if [ "$output" -eq 1 ]; then
                 output=0
             else
                 output=1
             fi
-        elif [ "$ret" -eq "$EC_KEY_ELIF" ]; then
+        elif [ "$ret" -eq "$EC_KW_ELIF" ]; then
             output=0
             ignore_else=1
         fi
@@ -157,26 +163,45 @@ compiler.parse_line() {
                 compiler.parse_if "$(compiler.eval_condition "$condition")"
                 ;;
             else)
-                return "$EC_KEY_ELSE"
+                return "$EC_KW_ELSE"
                 ;;
             elif)
                 if [ "$output" -eq 1 ]; then
-                    return "$EC_KEY_ELIF"
+                    return "$EC_KW_ELIF"
                 else
                     local condition="$(compiler.get_condition "$line")"
                     compiler.parse_if "$(compiler.eval_condition "$condition")"
-                    return "$EC_KEY_FI"
+                    return "$EC_KW_FI"
                 fi
                 ;;
             fi)
-                return "$EC_KEY_FI"
+                return "$EC_KW_FI"
                 ;;
-            #export
-            #exec
-            #def?
-            #for/continue/done?
-            #ask/prompt?
-            #write/write_comment?
+            export)
+                #@TODO
+                msg.print "NOT IMPLEMENTED"
+                compiler.print_error
+                ;;
+            exec)
+                msg.print "NOT IMPLEMENTED"
+                compiler.print_error
+                ;;
+            print_out)
+                msg.print "NOT IMPLEMENTED"
+                compiler.print_error
+                ;;
+            print_err)
+                msg.print "NOT IMPLEMENTED"
+                compiler.print_error
+                ;;
+            log)
+                msg.print "NOT IMPLEMENTED"
+                compiler.print_error
+                ;;
+            prompt)
+                msg.print "NOT IMPLEMENTED"
+                compiler.print_error
+                ;;
             *)
                 compiler.print_error
                 exit 1
@@ -189,12 +214,6 @@ compiler.parse_line() {
     elif [ "$output" -eq 1 ]; then
         echo "$line" >> "$target"
     fi
-}
-
-##############################################################################
-
-compiler.include_raw() {
-    cat "$1" >> "$target"
 }
 
 ##############################################################################
