@@ -80,8 +80,6 @@ compiler.get_var() {
 ##############################################################################
 
 compiler.get_condition() {
-    # @TODO: implement
-    :
     local cmd="$1"
     local sed_string="s/^$EC_COMMENT$EC_PROMPT if//;\
                       s/^$EC_COMMENT$EC_PROMPT elif//;\
@@ -93,11 +91,8 @@ compiler.get_condition() {
 ##############################################################################
 
 compiler.eval_condition() {
-    if eval "$1"; then
-        echo "1"
-    else
-        echo "0"
-    fi
+    eval "$1"
+    echo "$?"
 }
 
 ##############################################################################
@@ -176,6 +171,12 @@ compiler.parse_line() {
             fi)
                 return "$EC_KEY_FI"
                 ;;
+            #export
+            #exec
+            #def?
+            #for/continue/done?
+            #ask/prompt?
+            #write/write_comment?
             *)
                 compiler.print_error
                 exit 1
