@@ -51,6 +51,7 @@ compiler.compile() {
 
 compiler.parse_file() {
     local file="$1"
+    local raw="$2"
 
     # Reset line number before parsing file
     line_nr=0
@@ -65,13 +66,6 @@ compiler.parse_file() {
             exit 1
         fi
     done < "$file"
-}
-
-##############################################################################
-
-#@TODO optionaly strip comments (toglable for all output)
-compiler.include_raw() {
-    cat "$1" >> "$target"
 }
 
 ##############################################################################
@@ -135,8 +129,9 @@ compiler.parse_line() {
     # Count parsed lines
     let line_nr=line_nr+1
 
-    if [[ "$line" =~ ^"$EC_COMMENT$EC_PROMPT".* ]]; then
+    if [ -z "$raw" ] && [[ "$line" =~ ^"$EC_COMMENT$EC_PROMPT".* ]]; then
         local keyword="$(compiler.get_keyword "$line")"
+        #tmp debug output
         msg.print "keyword : $keyword"
         case $keyword in
             include)
@@ -152,7 +147,7 @@ compiler.parse_line() {
                 # Get file name
                 local inc_file="$(cut -d ' ' -f3 <<< "$line")"
 
-                compiler.include_raw "$inc_file"
+                compiler.parse_file "$inc_file" "raw"
                 ;;
             def_var)
                 local var="$(compiler.get_var "$line")"
@@ -179,27 +174,32 @@ compiler.parse_line() {
                 ;;
             export)
                 #@TODO
-                msg.print "NOT IMPLEMENTED"
+                msg.print "'$keyword' NOT IMPLEMENTED"
                 compiler.print_error
                 ;;
             exec)
-                msg.print "NOT IMPLEMENTED"
+                #@TODO
+                msg.print "'$keyword' NOT IMPLEMENTED"
                 compiler.print_error
                 ;;
             print_out)
-                msg.print "NOT IMPLEMENTED"
+                #@TODO
+                msg.print "'$keyword' NOT IMPLEMENTED"
                 compiler.print_error
                 ;;
             print_err)
-                msg.print "NOT IMPLEMENTED"
+                #@TODO
+                msg.print "'$keyword' NOT IMPLEMENTED"
                 compiler.print_error
                 ;;
             log)
-                msg.print "NOT IMPLEMENTED"
+                #@TODO
+                msg.print "'$keyword' NOT IMPLEMENTED"
                 compiler.print_error
                 ;;
             prompt)
-                msg.print "NOT IMPLEMENTED"
+                #@TODO
+                msg.print "'$keyword' NOT IMPLEMENTED"
                 compiler.print_error
                 ;;
             *)
