@@ -52,12 +52,18 @@ compiler.compile() {
         exit 1
     fi
 
-    #@TODO Compile to tmp file and replace if successfull
+    #@TODO Compile to tmp file and replace if successful
+
+    # Preserve leading whitespace
+    IFS=$'\n'
 
     local target="${2:-${file}.out}"
     msg.bold "Compiling $file"
     echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
     compiler.parse_file "$file"
+
+    # Reset IFS to default
+    unset IFS
 
     #@TODO Log if config changed
     msg.print "Successfully compiled $file"
@@ -149,10 +155,6 @@ compiler.parse_line() {
         local keyword="$(compiler.get_keyword "$raw_line")"
         local line="$(compiler.get_line "$raw_line")"
 
-        #tmp debug output
-        #msg.print "keyword : $keyword"
-        #msg.print "line : $line"
-
         case $keyword in
             include)
                 msg.print "Including $line"
@@ -194,16 +196,16 @@ compiler.parse_line() {
                 echo "$line" >> "$target"
                 ;;
             msg)
-                msg.print "$file : $line"
+                msg.print "$file: $line"
                 ;;
             log|log_ok)
-                log.ok "$file : $line"
+                log.ok "$file: $line"
                 ;;
             log_warn)
-                log.warn "$file : $line"
+                log.warn "$file: $line"
                 ;;
             log_err)
-                log.error "$file : $line"
+                log.error "$file: $line"
                 ;;
             exit)
                 exit "$line"
@@ -218,7 +220,7 @@ compiler.parse_line() {
                 exit 1
                 ;;
             esac
-    elif [[ "$line" =~ ^"$EC_COMMENT".* ]] ||\
+    elif [[ "$line" =~ ^[[:space:]]*"$EC_COMMENT".* ]] ||\
             [[ "$line" =~ ^$ ]]; then
         # Ignore commented and empty lines
         :
