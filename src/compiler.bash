@@ -25,11 +25,11 @@ EC_KW_ELIF=12
 compiler.print_error() {
     local err_msg="$1"
 
-    msg.print "Syntax error in $file_name at line nr $line_nr:"
-    msg.print "| $file:$line_nr:"
+    msg.print "Syntax error in '$file_name' at line nr $line_nr:"
+    msg.print "| $file:$line_nr"
     msg.print "|    '${raw_line:-$line}'"
     if [ -n "$err_msg" ]; then
-        msg.print ">    $err_msg"
+        msg.print "> $err_msg"
     fi
 }
 
@@ -165,12 +165,22 @@ compiler.parse_line() {
 
         case $keyword in
             include)
-                local file="$(path.abs_path "$line")"
-                compiler.parse_file "$file"
+                if [ -f "$line" ]; then
+                    local file="$(path.abs_path "$line")"
+                    compiler.parse_file "$file"
+                else
+                    compiler.print_error "File not found : '$line'"
+                    exit 1
+                fi
                 ;;
             include_raw)
-                local file="$(path.abs_path "$line")"
-                compiler.parse_file "$file" "raw"
+                if [ -f "$line" ]; then
+                    local file="$(path.abs_path "$line")"
+                    compiler.parse_file "$file" "raw"
+                else
+                    compiler.print_error "File not found : '$line'"
+                    exit 1
+                fi
                 ;;
             if)
                 # Get condition and parse if
