@@ -1,5 +1,7 @@
 # Ellipsis-compiler [![Build Status][travis-image]][travis-url] [![Documentation status][docs-image]][docs-url] [![Latest tag][tag-image]][tag-url] [![Gitter chat][gitter-image]][gitter-url]
 
+**Warning: This project is in an early alpha stage. Use at own risk!**
+
 TODO
 
 ### Features
