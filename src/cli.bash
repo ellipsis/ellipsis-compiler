@@ -15,7 +15,7 @@ load compiler
 # prints usage
 cli.usage() {
 msg.print "\
-Usage: ellipsis-$ELLIPSIS_XNAME_L <files>
+Usage: ellipsis-$ELLIPSIS_XNAME_L <input_file> <output_file>
   Options:
     -h, --help     show help
     -v, --version  show version"

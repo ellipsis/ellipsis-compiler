@@ -21,6 +21,7 @@ EC_KW_ELIF=12
 
 ##############################################################################
 
+# expects $file, $line_nr and $raw_line or $line to be set
 compiler.print_error() {
     local err_msg="$1"
 
@@ -34,13 +35,13 @@ compiler.print_error() {
 ##############################################################################
 
 compiler.get_keyword() {
-    cut -d ' ' -f2 <<< "$1"
+    awk '{print $2;}' <<< "$1"
 }
 
 ##############################################################################
 
 compiler.get_line() {
-    cut -d ' ' -f3- <<< "$1"
+    awk '{for (i=3; i<NF; i++) printf $i " "; print $NF}' <<<"$1"
 }
 
 ##############################################################################
@@ -52,12 +53,14 @@ compiler.compile() {
         exit 1
     fi
 
+    # Target defaults to "$file.out"
+    local target="${2:-${file}.out}"
+
     #@TODO Compile to tmp file and replace if successful
 
-    # Preserve leading whitespace
+    # Preserve leading whitespace by changing word separator
     IFS=$'\n'
 
-    local target="${2:-${file}.out}"
     msg.bold "Compiling $file"
     echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
     compiler.parse_file "$file"
@@ -80,22 +83,14 @@ compiler.parse_file() {
 
     # Parse file
     while read line; do
-        local output=1
+        local output=true
         compiler.parse_line "$line"
-        if [ "$?" -eq 1 -o "$?" -eq 2 ]; then
+        local ret="$?"
+        if [ "$ret" -eq 1 -o "$ret" -eq 2 ]; then
             compiler.print_error "'if' without matching 'fi'"
             exit 1
         fi
     done < "$file"
-}
-
-##############################################################################
-
-compiler.get_var() {
-    local cmd="$1"
-    local sed_string="s/^$EC_COMMENT$EC_PROMPT def_var//"
-
-    sed "$sed_string" <<< "$cmd"
 }
 
 ##############################################################################
@@ -111,16 +106,14 @@ compiler.get_condition() {
 
 ##############################################################################
 
-compiler.eval_condition() {
-    eval "$1"
-    echo "$?"
-}
-
-##############################################################################
-
 compiler.parse_if() {
-    output="$1"
-    local ignore_else=0
+    if eval "$1"; then
+        output=true
+    else
+        output=false
+    fi
+
+    local ignore_else=false
 
     while read line; do
         compiler.parse_line "$line"
@@ -128,15 +121,15 @@ compiler.parse_if() {
 
         if [ "$ret" -eq "$EC_KW_FI" ]; then
             return
-        elif [ "$ret" -eq "$EC_KW_ELSE" -a "$ignore_else" -eq 0 ]; then
-            if [ "$output" -eq 1 ]; then
-                output=0
+        elif [ "$ret" -eq "$EC_KW_ELSE" ] && ! "$ignore_else"; then
+            if "$output"; then
+                output=false
             else
-                output=1
+                output=true
             fi
         elif [ "$ret" -eq "$EC_KW_ELIF" ]; then
-            output=0
-            ignore_else=1
+            output=false
+            ignore_else=true
         fi
     done
 
@@ -150,7 +143,7 @@ compiler.parse_line() {
     # Count parsed lines
     let line_nr=line_nr+1
 
-    if [ -z "$raw" ] && [[ "$line" =~ ^"$EC_COMMENT$EC_PROMPT".* ]]; then
+    if [ -z "$raw" ] && [[ "$line" =~ ^"$EC_COMMENT"[[:space:]]*"$EC_PROMPT".* ]]; then
         local raw_line="$line"
         local keyword="$(compiler.get_keyword "$raw_line")"
         local line="$(compiler.get_line "$raw_line")"
@@ -158,42 +151,52 @@ compiler.parse_line() {
         case $keyword in
             include)
                 msg.print "Including $line"
-                # Keep line_nr in current file and process include
+
+                # Keep line_nr in current file and set indent lvl +1
                 local tmp_line_nr="$line_nr"
                 let ELLIPSIS_LVL=ELLIPSIS_LVL+1
+
                 msg.bold "$line"
                 compiler.parse_file "$line"
+
+                # Restore indent lvl and line_nr
                 let ELLIPSIS_LVL=ELLIPSIS_LVL-1
                 line_nr="$tmp_line_nr"
                 ;;
             include_raw)
                 msg.print "Including $line (raw)"
+
                 compiler.parse_file "$line" "raw"
                 ;;
             if)
-                local condition="$(compiler.get_condition "$line")"
-                compiler.parse_if "$(compiler.eval_condition "$condition")"
+                # Get condition and parse if
+                compiler.parse_if "$(compiler.get_condition "$line")"
                 ;;
             else)
+                # Return else code to if parser
                 return "$EC_KW_ELSE"
                 ;;
             elif)
-                if [ "$output" -eq 1 ]; then
+                # Return elif code to if parser and optionally parse own if
+                if "$output"; then
                     return "$EC_KW_ELIF"
                 else
-                    local condition="$(compiler.get_condition "$line")"
-                    compiler.parse_if "$(compiler.eval_condition "$condition")"
+                    compiler.parse_if "$(compiler.get_condition "$line")"
                     return "$EC_KW_FI"
                 fi
                 ;;
             fi)
+                # Return fi code to if parser
                 return "$EC_KW_FI"
                 ;;
             raw)
+                # Do funky stuff
                 eval "$line"
                 ;;
             write)
-                echo "$line" >> "$target"
+                if "$output"; then
+                    echo "$line" >> "$target"
+                fi
                 ;;
             msg)
                 msg.print "$file: $line"
@@ -224,7 +227,7 @@ compiler.parse_line() {
             [[ "$line" =~ ^$ ]]; then
         # Ignore commented and empty lines
         :
-    elif [ "$output" -eq 1 ]; then
+    elif "$output"; then
         echo "$line" >> "$target"
     fi
 }
