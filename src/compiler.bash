@@ -25,8 +25,9 @@ EC_KW_ELIF=12
 compiler.print_error() {
     local err_msg="$1"
 
-    msg.print "Syntax error in $file at line nr $line_nr:"
-    msg.print ">    '${raw_line:-$line}'"
+    msg.print "Syntax error in $file_name at line nr $line_nr:"
+    msg.print "| $file:$line_nr:"
+    msg.print "|    '${raw_line:-$line}'"
     if [ -n "$err_msg" ]; then
         msg.print ">    $err_msg"
     fi
@@ -47,7 +48,8 @@ compiler.get_line() {
 ##############################################################################
 
 compiler.compile() {
-    local file="$1"
+    local file="$(path.abs_path "$1")"
+    local file_name="$(basename "$file")"
     if [ -z "$file" ]; then
         msg.print "Please provide an input file"
         exit 1
@@ -61,7 +63,7 @@ compiler.compile() {
     # Preserve leading whitespace by changing word separator
     IFS=$'\n'
 
-    msg.bold "Compiling $file"
+    msg.bold "Compiling $file_name"
     echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
     compiler.parse_file "$file"
 
@@ -69,7 +71,7 @@ compiler.compile() {
     unset IFS
 
     #@TODO Log if config changed
-    msg.print "Successfully compiled $file"
+    msg.print "Successfully compiled $file_name"
 }
 
 ##############################################################################
@@ -78,7 +80,15 @@ compiler.parse_file() {
     local file="$1"
     local raw="$2"
 
-    # Reset line number before parsing file
+    # Keep pwd, line_nr and increment indent lvl
+    local cwd="$(pwd)"
+    local tmp_line_nr="$line_nr"
+    #let ELLIPSIS_LVL=ELLIPSIS_LVL+1
+
+    # Run in correct folder (relative file support)
+    cd "$(dirname "$file")"
+
+    # Start line nr's from zero for this file
     line_nr=0
 
     # Parse file
@@ -91,6 +101,11 @@ compiler.parse_file() {
             exit 1
         fi
     done < "$file"
+
+    # Restore indent lvl, line_nr, and pwd
+    #let ELLIPSIS_LVL=ELLIPSIS_LVL-1
+    line_nr="$tmp_line_nr"
+    cd "$cwd"
 }
 
 ##############################################################################
@@ -150,23 +165,12 @@ compiler.parse_line() {
 
         case $keyword in
             include)
-                msg.print "Including $line"
-
-                # Keep line_nr in current file and set indent lvl +1
-                local tmp_line_nr="$line_nr"
-                let ELLIPSIS_LVL=ELLIPSIS_LVL+1
-
-                msg.bold "$line"
-                compiler.parse_file "$line"
-
-                # Restore indent lvl and line_nr
-                let ELLIPSIS_LVL=ELLIPSIS_LVL-1
-                line_nr="$tmp_line_nr"
+                local file="$(path.abs_path "$line")"
+                compiler.parse_file "$file"
                 ;;
             include_raw)
-                msg.print "Including $line (raw)"
-
-                compiler.parse_file "$line" "raw"
+                local file="$(path.abs_path "$line")"
+                compiler.parse_file "$file" "raw"
                 ;;
             if)
                 # Get condition and parse if
@@ -199,19 +203,11 @@ compiler.parse_line() {
                 fi
                 ;;
             msg)
-                msg.print "$file: $line"
+                msg.print "$file_name: $line"
                 ;;
-            log|log_ok)
-                log.ok "$file: $line"
-                ;;
-            log_warn)
-                log.warn "$file: $line"
-                ;;
-            log_err)
-                log.error "$file: $line"
-                ;;
-            exit)
-                exit "$line"
+            fail)
+                msg.print "$line"
+                exit 1
                 ;;
             *)
                 compiler.print_error "unknown keyword '$keyword'"
