@@ -10,7 +10,7 @@ load log
 ##############################################################################
 
 EC_COMMENT="${EC_COMMENT:-"#"}"
-EC_PROMPT="${EC_PROMPT:-"->$"}"
+EC_PROMPT="${EC_PROMPT:-"_>"}"
 
 ##############################################################################
 
@@ -193,7 +193,7 @@ compiler.parse_line() {
                 # Do funky stuff
                 eval "$line"
                 ;;
-            write)
+            \>|write)
                 if "$output"; then
                     echo "$line" >> "$target"
                 fi
@@ -212,11 +212,6 @@ compiler.parse_line() {
                 ;;
             exit)
                 exit "$line"
-                ;;
-            prompt)
-                #@TODO
-                compiler.print_error "'$keyword' not implemented"
-                exit 1
                 ;;
             *)
                 compiler.print_error "unknown keyword '$keyword'"
