@@ -22,14 +22,25 @@ EC_KW_ELIF=12
 ##############################################################################
 
 compiler.print_error() {
+    local err_msg="$1"
+
     msg.print "Syntax error in $file at line nr $line_nr:"
-    msg.print "    '$line'"
+    msg.print ">    '${raw_line:-$line}'"
+    if [ -n "$err_msg" ]; then
+        msg.print ">    $err_msg"
+    fi
 }
 
 ##############################################################################
 
 compiler.get_keyword() {
     cut -d ' ' -f2 <<< "$1"
+}
+
+##############################################################################
+
+compiler.get_line() {
+    cut -d ' ' -f3- <<< "$1"
 }
 
 ##############################################################################
@@ -41,10 +52,15 @@ compiler.compile() {
         exit 1
     fi
 
+    #@TODO Compile to tmp file and replace if successfull
+
     local target="${2:-${file}.out}"
     msg.bold "Compiling $file"
     echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
     compiler.parse_file "$file"
+
+    #@TODO Log if config changed
+    msg.print "Successfully compiled $file"
 }
 
 ##############################################################################
@@ -61,8 +77,7 @@ compiler.parse_file() {
         local output=1
         compiler.parse_line "$line"
         if [ "$?" -eq 1 -o "$?" -eq 2 ]; then
-            compiler.print_error
-            msg.print "    'fi' without matching 'if'"
+            compiler.print_error "'if' without matching 'fi'"
             exit 1
         fi
     done < "$file"
@@ -119,7 +134,7 @@ compiler.parse_if() {
         fi
     done
 
-    msg.print "Syntax error in $file, missing 'fi'"
+    compiler.print_error "'if' without matching 'fi'"
     exit 1
 }
 
@@ -130,28 +145,28 @@ compiler.parse_line() {
     let line_nr=line_nr+1
 
     if [ -z "$raw" ] && [[ "$line" =~ ^"$EC_COMMENT$EC_PROMPT".* ]]; then
-        local keyword="$(compiler.get_keyword "$line")"
+        local raw_line="$line"
+        local keyword="$(compiler.get_keyword "$raw_line")"
+        local line="$(compiler.get_line "$raw_line")"
+
         #tmp debug output
-        msg.print "keyword : $keyword"
+        #msg.print "keyword : $keyword"
+        #msg.print "line : $line"
+
         case $keyword in
             include)
-                # Get file name
-                local inc_file="$(cut -d ' ' -f3 <<< "$line")"
-
+                msg.print "Including $line"
                 # Keep line_nr in current file and process include
                 local tmp_line_nr="$line_nr"
-                compiler.parse_file "$inc_file"
+                let ELLIPSIS_LVL=ELLIPSIS_LVL+1
+                msg.bold "$line"
+                compiler.parse_file "$line"
+                let ELLIPSIS_LVL=ELLIPSIS_LVL-1
                 line_nr="$tmp_line_nr"
                 ;;
             include_raw)
-                # Get file name
-                local inc_file="$(cut -d ' ' -f3 <<< "$line")"
-
-                compiler.parse_file "$inc_file" "raw"
-                ;;
-            def_var)
-                local var="$(compiler.get_var "$line")"
-                eval "$var"
+                msg.print "Including $line (raw)"
+                compiler.parse_file "$line" "raw"
                 ;;
             if)
                 local condition="$(compiler.get_condition "$line")"
@@ -172,38 +187,34 @@ compiler.parse_line() {
             fi)
                 return "$EC_KW_FI"
                 ;;
-            export)
-                #@TODO
-                msg.print "'$keyword' NOT IMPLEMENTED"
-                compiler.print_error
+            raw)
+                eval "$line"
                 ;;
-            exec)
-                #@TODO
-                msg.print "'$keyword' NOT IMPLEMENTED"
-                compiler.print_error
+            write)
+                echo "$line" >> "$target"
                 ;;
-            print_out)
-                #@TODO
-                msg.print "'$keyword' NOT IMPLEMENTED"
-                compiler.print_error
+            msg)
+                msg.print "$file : $line"
                 ;;
-            print_err)
-                #@TODO
-                msg.print "'$keyword' NOT IMPLEMENTED"
-                compiler.print_error
+            log|log_ok)
+                log.ok "$file : $line"
                 ;;
-            log)
-                #@TODO
-                msg.print "'$keyword' NOT IMPLEMENTED"
-                compiler.print_error
+            log_warn)
+                log.warn "$file : $line"
+                ;;
+            log_err)
+                log.error "$file : $line"
+                ;;
+            exit)
+                exit "$line"
                 ;;
             prompt)
                 #@TODO
-                msg.print "'$keyword' NOT IMPLEMENTED"
-                compiler.print_error
+                compiler.print_error "'$keyword' not implemented"
+                exit 1
                 ;;
             *)
-                compiler.print_error
+                compiler.print_error "unknown keyword '$keyword'"
                 exit 1
                 ;;
             esac
