@@ -9,31 +9,25 @@ load cli
 @test "cli.run without command prints usage" {
     run cli.run
     [ "$status" -eq 1 ]
-    [ "${lines[0]}" = "Usage: ellipsis-$ELLIPSIS_XNAME_L <command>" ]
-}
-
-@test "cli.run with invalid command prints usage" {
-    run cli.run invalid_command
-    [ "$status" -eq 1 ]
-    [ "${lines[1]}" = "Usage: ellipsis-$ELLIPSIS_XNAME_L <command>" ]
+    [ "${lines[0]}" = "Usage: ellipsis-$ELLIPSIS_XNAME_L <input_file> <output_file>" ]
 }
 
 @test "cli.run help prints usage" {
     run cli.run help
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "Usage: ellipsis-$ELLIPSIS_XNAME_L <command>" ]
+    [ "${lines[0]}" = "Usage: ellipsis-$ELLIPSIS_XNAME_L <input_file> <output_file>" ]
 }
 
 @test "cli.run --help prints usage" {
     run cli.run --help
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "Usage: ellipsis-$ELLIPSIS_XNAME_L <command>" ]
+    [ "${lines[0]}" = "Usage: ellipsis-$ELLIPSIS_XNAME_L <input_file> <output_file>" ]
 }
 
 @test "cli.run -h prints usage" {
     run cli.run -h
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "Usage: ellipsis-$ELLIPSIS_XNAME_L <command>" ]
+    [ "${lines[0]}" = "Usage: ellipsis-$ELLIPSIS_XNAME_L <input_file> <output_file>" ]
 }
 
 @test "cli.run version prints version" {
