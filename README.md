@@ -1,8 +1,12 @@
 # Ellipsis-compiler [![Build Status][travis-image]][travis-url] [![Documentation status][docs-image]][docs-url] [![Latest tag][tag-image]][tag-url] [![Gitter chat][gitter-image]][gitter-url]
 
+Configuration file compiler
+
 **Warning: This project is in an early alpha stage. Use at own risk!**
 
-TODO
+Ellipsis-Compiler is a compiler for configuration files. It makes it possible
+to use logic in any config file. This allows you to make dynamic
+configurations, even if this is normally not supported.
 
 ### Features
 - ...
@@ -24,6 +28,14 @@ need to symlink `.ellipsis/bin/ellipsis-compiler` to a folder that is in your pa
 
 ### Usage
 
+Basic usage:
+
+```bash
+$ ellipsis-compiler $input-file $output-file
+```
+If the output file is omitted, `$input-file.out` will be used.
+
+U can alter the behavior of the compiler by setting some env. variables.
 TODO
 
 ### Docs
