@@ -57,6 +57,7 @@ compiler.compile() {
 
     # Target defaults to "$file.out"
     local target="${2:-${file}.out}"
+    local tmp_target="$(mktemp /tmp/ec_out-XXXXXX)"
 
     #@TODO Compile to tmp file and replace if successful
 
@@ -64,11 +65,13 @@ compiler.compile() {
     IFS=$'\n'
 
     msg.bold "Compiling $file_name"
-    echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
+    echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$tmp_target"
     compiler.parse_file "$file"
 
     # Reset IFS to default
     unset IFS
+
+    mv "$tmp_target" "$target"
 
     #@TODO Log if config changed
     msg.print "Successfully compiled $file_name"
@@ -209,7 +212,7 @@ compiler.parse_line() {
                 ;;
             \>|write)
                 if "$output"; then
-                    echo "$line" >> "$target"
+                    echo "$line" >> "$tmp_target"
                 fi
                 ;;
             msg)
@@ -229,7 +232,7 @@ compiler.parse_line() {
         # Ignore commented and empty lines
         :
     elif "$output"; then
-        echo "$line" >> "$target"
+        echo "$line" >> "$tmp_target"
     fi
 }
 
