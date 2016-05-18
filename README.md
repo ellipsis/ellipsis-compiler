@@ -48,23 +48,70 @@ by setting the `$EC_COMMENT` variable. Lines with a special meaning are
 indicated with a prompt like string `_>`. This can be altered by setting the
 `$EC_PROMPT` variable.
 
+###### Example
+```bash
+
+```
+
 ##### include (include_raw)
-TODO
+Include a file, or include a file without processing (include_raw).
+
+```bash
+#_> include test_file.conf
+#_> include_raw raw_config.conf
+```
 
 ##### if (then, else, elif)
-TODO
+Use the if,then,else/elif construction to alter compilation output.
+
+```bash
+# TODO
+```
 
 ##### raw
-TODO
+Perform a raw shell command and write output to the compiled file.
+
+```bash
+# TODO
+```
 
 ##### write (>)
-TODO
+Write a string to the output file.
+
+```bash
+conf.settings=example
+#_> write #_> put the magic string in the file
+conf.server=test
+
+# Using the short form, ideal for indenting lines
+#_> if [ ! -f test_file ]; then
+#_>     > conf.settings=default_file
+#_> else
+#_>     > conf.settings=test_file
+#_> fi
+```
 
 ##### msg
-TODO
+Print a message to stdout, to inform a user about something.
+
+```bash
+conf.settings=example
+conf.server=test
+#_> msg Config is using server 'test'
+
+conf.name=dev
+```
 
 ##### fail
-TODO
+Stop compilation and display the given message.
+
+```bash
+#_> if [ ! -f test_file ]; then
+#_>     fail Could not compile!
+#_> else
+        conf.settings=test_file
+#_> fi
+```
 
 ### Docs
 Please consult the [docs][docs-url] for more information.
