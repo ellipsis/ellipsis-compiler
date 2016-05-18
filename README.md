@@ -38,6 +38,34 @@ If the output file is omitted, `$input-file.out` will be used.
 U can alter the behavior of the compiler by setting some env. variables.
 TODO
 
+#### Syntax
+Ellipsis-Compiler uses specially formatted comments for its syntax. This will
+preserve syntax highlighting/checks and makes it possible to have a files that
+also work if they aren't compiled.
+
+By default the `#` symbol is used to indicate comments, but this can be altered
+by setting the `$EC_COMMENT` variable. Lines with a special meaning are
+indicated with a prompt like string `_>`. This can be altered by setting the
+`$EC_PROMPT` variable.
+
+##### include (include_raw)
+TODO
+
+##### if (then, else, elif)
+TODO
+
+##### raw
+TODO
+
+##### write (>)
+TODO
+
+##### msg
+TODO
+
+##### fail
+TODO
+
 ### Docs
 Please consult the [docs][docs-url] for more information.
 
