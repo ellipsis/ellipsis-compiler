@@ -21,6 +21,18 @@ EC_KW_ELIF=12
 
 ##############################################################################
 
+compiler.cleanup() {
+    # Reset IFS to default
+    unset IFS
+
+    # Remove buffer file if it exists
+    if [ -f "$tmp_target" ]; then
+        rm "$tmp_target"
+    fi
+}
+
+##############################################################################
+
 # expects $file, $line_nr and $raw_line or $line to be set
 compiler.print_error() {
     local err_msg="$1"
@@ -57,9 +69,7 @@ compiler.compile() {
 
     # Target defaults to "$file.out"
     local target="${2:-${file}.out}"
-    local tmp_target="$(mktemp /tmp/ec_out-XXXXXX)"
-
-    #@TODO Compile to tmp file and replace if successful
+    local tmp_target="$(mktemp "/tmp/ec_${file_name}-XXXXXX")"
 
     # Preserve leading whitespace by changing word separator
     IFS=$'\n'
@@ -68,13 +78,15 @@ compiler.compile() {
     echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$tmp_target"
     compiler.parse_file "$file"
 
-    # Reset IFS to default
-    unset IFS
-
     mv "$tmp_target" "$target"
+    if [ ! "$?" -eq 0 ]; then
+        log.fail "Could not write $target"
+        compiler.cleanup
+        exit 1
+    fi
 
-    #@TODO Log if config changed
-    msg.print "Successfully compiled $file_name"
+    log.ok "Successfully compiled $file_name"
+    compiler.cleanup
 }
 
 ##############################################################################
@@ -101,6 +113,7 @@ compiler.parse_file() {
         local ret="$?"
         if [ "$ret" -eq 1 -o "$ret" -eq 2 ]; then
             compiler.print_error "'if' without matching 'fi'"
+            compiler.cleanup
             exit 1
         fi
     done < "$file"
@@ -152,6 +165,7 @@ compiler.parse_if() {
     done
 
     compiler.print_error "'if' without matching 'fi'"
+    compiler.cleanup
     exit 1
 }
 
@@ -173,6 +187,7 @@ compiler.parse_line() {
                     compiler.parse_file "$file"
                 else
                     compiler.print_error "File not found : '$line'"
+                    compiler.cleanup
                     exit 1
                 fi
                 ;;
@@ -182,6 +197,7 @@ compiler.parse_line() {
                     compiler.parse_file "$file" "raw"
                 else
                     compiler.print_error "File not found : '$line'"
+                    compiler.cleanup
                     exit 1
                 fi
                 ;;
@@ -220,10 +236,12 @@ compiler.parse_line() {
                 ;;
             fail)
                 msg.print "$line"
+                compiler.cleanup
                 exit 1
                 ;;
             *)
                 compiler.print_error "unknown keyword '$keyword'"
+                compiler.cleanup
                 exit 1
                 ;;
             esac
