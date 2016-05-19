@@ -35,22 +35,19 @@ $ ellipsis-compiler $input-file $output-file
 ```
 If the output file is omitted, `$input-file.out` will be used.
 
-U can alter the behavior of the compiler by setting some env. variables.
-TODO
-
 #### Syntax
 Ellipsis-Compiler uses specially formatted comments for its syntax. This will
-preserve syntax highlighting/checks and makes it possible to have a files that
+preserve syntax highlighting/checks and makes it possible to have files that
 also work if they aren't compiled.
 
 By default the `#` symbol is used to indicate comments, but this can be altered
-by setting the `$EC_COMMENT` variable. Lines with a special meaning are
-indicated with a prompt like string `_>`. This can be altered by setting the
-`$EC_PROMPT` variable.
+by setting the `$EC_COMMENT` variable. Lines that need to be interpreted by the
+compiler are indicated with a prompt like string `_>`. This string can be
+altered by setting the `$EC_PROMPT` variable.
 
 ###### Example
 ```bash
-
+# TODO
 ```
 
 ##### include (include_raw)
@@ -60,30 +57,44 @@ Include a file, or include a file without processing (include_raw).
 #_> include test_file.conf
 #_> include_raw raw_config.conf
 ```
+Output will include the processed content of `test_file.conf` and the raw content
+of `raw_config.conf`.
 
 ##### if (then, else, elif)
-Use the if,then,else/elif construction to alter compilation output.
+Use the if,then,else/elif construction to alter compilation output. The test
+itself is just bash (with all it's possibilities).
 
 ```bash
-# TODO
+## Use default file if test_file is not available
+#_> if [ ! -f test_file ]; then
+conf.settings=default_file
+#_> else
+conf.settings=test_file
+#_> fi
 ```
 
 ##### raw
-Perform a raw shell command and write output to the compiled file.
+Perform a raw shell command. Output can be redirected to `$target` to add it to
+the compiled file.
+
+Try to avoid the raw command, it is only provided for really funky stuff. Your
+task not that funky? Please consider to provide a pull request for your missing
+feature or submit an issue.
 
 ```bash
-# TODO
+## Use the current kernel number in your config file
+#_> raw echo "config.kernel=$(uname -r)" > "$target"
 ```
 
 ##### write (>)
 Write a string to the output file.
 
 ```bash
-conf.settings=example
-#_> write #_> put the magic string in the file
-conf.server=test
+## Writes '#_> command' to the output file
+#_> write #_> command
 
-# Using the short form, ideal for indenting lines
+## Using the short form, ideal for indenting lines without introducing
+## whitespace infront of the lines.
 #_> if [ ! -f test_file ]; then
 #_>     > conf.settings=default_file
 #_> else
@@ -95,17 +106,15 @@ conf.server=test
 Print a message to stdout, to inform a user about something.
 
 ```bash
-conf.settings=example
-conf.server=test
-#_> msg Config is using server 'test'
-
-conf.name=dev
+## Prints 'Hello world' to stdout
+#_> msg Hello world
 ```
 
 ##### fail
 Stop compilation and display the given message.
 
 ```bash
+## If test_file exists it is used in hte config, else compilation will fail
 #_> if [ ! -f test_file ]; then
 #_>     fail Could not compile!
 #_> else

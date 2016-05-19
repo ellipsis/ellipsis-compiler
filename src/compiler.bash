@@ -26,8 +26,8 @@ compiler.cleanup() {
     unset IFS
 
     # Remove buffer file if it exists
-    if [ -f "$tmp_target" ]; then
-        rm "$tmp_target"
+    if [ -f "$target" ]; then
+        rm "$target"
     fi
 }
 
@@ -68,19 +68,19 @@ compiler.compile() {
     fi
 
     # Target defaults to "$file.out"
-    local target="${2:-${file}.out}"
-    local tmp_target="$(mktemp "/tmp/ec_${file_name}-XXXXXX")"
+    local dest="${2:-${file}.out}"
+    local target="$(mktemp "/tmp/ec_${file_name}-XXXXXX")"
 
     # Preserve leading whitespace by changing word separator
     IFS=$'\n'
 
     msg.bold "Compiling $file_name"
-    echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$tmp_target"
+    echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
     compiler.parse_file "$file"
 
-    mv "$tmp_target" "$target"
+    mv "$target" "$dest"
     if [ ! "$?" -eq 0 ]; then
-        log.fail "Could not write $target"
+        log.fail "Could not write $dest"
         compiler.cleanup
         exit 1
     fi
@@ -228,7 +228,7 @@ compiler.parse_line() {
                 ;;
             \>|write)
                 if "$output"; then
-                    echo "$line" >> "$tmp_target"
+                    echo "$line" >> "$target"
                 fi
                 ;;
             msg)
@@ -250,7 +250,7 @@ compiler.parse_line() {
         # Ignore commented and empty lines
         :
     elif "$output"; then
-        echo "$line" >> "$tmp_target"
+        echo "$line" >> "$target"
     fi
 }
 
