@@ -79,7 +79,9 @@ compiler.compile() {
     IFS=$'\n'
 
     msg.bold "Compiling $file_name"
-    echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
+    if [ -z "$EC_NOHEADER" ]; then
+        echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
+    fi
     compiler.parse_file "$file"
 
     # Move temp target to final destination
@@ -258,8 +260,10 @@ compiler.parse_line() {
     # Remove commented lines
     elif [[ "$line" =~ ^[[:space:]]*"$EC_COMMENT".* ]] ||\
             [[ "$line" =~ ^$ ]]; then
-        # Ignore commented and empty lines
-        :
+        # Keep comments if configured
+        if [ -n "$EC_PWS" ]; then
+            echo "$line" >> "$target"
+        fi
     # Add normal lines to the output
     elif "$output"; then
         echo "$line" >> "$target"
