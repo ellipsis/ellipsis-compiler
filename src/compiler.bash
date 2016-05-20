@@ -33,6 +33,7 @@ compiler.cleanup() {
 
 ##############################################################################
 
+# Outputs an error message
 # expects $file, $line_nr and $raw_line or $line to be set
 compiler.print_error() {
     local err_msg="$1"
@@ -47,18 +48,21 @@ compiler.print_error() {
 
 ##############################################################################
 
+# Extracts the keyword from a line
 compiler.get_keyword() {
     awk '{print $2;}' <<< "$1"
 }
 
 ##############################################################################
 
+# Extracts all content behind the keyword
 compiler.get_line() {
     awk '{for (i=3; i<NF; i++) printf $i " "; print $NF}' <<<"$1"
 }
 
 ##############################################################################
 
+# Compiles a file
 compiler.compile() {
     local file="$(path.abs_path "$1")"
     local file_name="$(basename "$file")"
@@ -78,6 +82,7 @@ compiler.compile() {
     echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
     compiler.parse_file "$file"
 
+    # Move temp target to final destination
     mv "$target" "$dest"
     if [ ! "$?" -eq 0 ]; then
         log.fail "Could not write $dest"
@@ -91,14 +96,14 @@ compiler.compile() {
 
 ##############################################################################
 
+# Parse a file
 compiler.parse_file() {
     local file="$1"
     local raw="$2"
 
-    # Keep pwd, line_nr and increment indent lvl
+    # Keep pwd and line_nr
     local cwd="$(pwd)"
     local tmp_line_nr="$line_nr"
-    #let ELLIPSIS_LVL=ELLIPSIS_LVL+1
 
     # Run in correct folder (relative file support)
     cd "$(dirname "$file")"
@@ -118,14 +123,14 @@ compiler.parse_file() {
         fi
     done < "$file"
 
-    # Restore indent lvl, line_nr, and pwd
-    #let ELLIPSIS_LVL=ELLIPSIS_LVL-1
+    # Restore line_nr, and pwd
     line_nr="$tmp_line_nr"
     cd "$cwd"
 }
 
 ##############################################################################
 
+# Extract the condition from a line
 compiler.get_condition() {
     local cmd="$1"
     local sed_string="s/^$EC_COMMENT$EC_PROMPT if//;\
@@ -137,6 +142,7 @@ compiler.get_condition() {
 
 ##############################################################################
 
+# Parse an IF structure (if, elif)
 compiler.parse_if() {
     if eval "$1"; then
         output=true
@@ -146,10 +152,12 @@ compiler.parse_if() {
 
     local ignore_else=false
 
+    # Process the if statement
     while read line; do
         compiler.parse_line "$line"
         local ret="$?"
 
+        # Handle relevant parser return codes
         if [ "$ret" -eq "$EC_KW_FI" ]; then
             return
         elif [ "$ret" -eq "$EC_KW_ELSE" ] && ! "$ignore_else"; then
@@ -164,6 +172,7 @@ compiler.parse_if() {
         fi
     done
 
+    # Only reached if no FI was encountered
     compiler.print_error "'if' without matching 'fi'"
     compiler.cleanup
     exit 1
@@ -175,6 +184,7 @@ compiler.parse_line() {
     # Count parsed lines
     let line_nr=line_nr+1
 
+    # Parse line if raw is not set
     if [ -z "$raw" ] && [[ "$line" =~ ^"$EC_COMMENT"[[:space:]]*"$EC_PROMPT".* ]]; then
         local raw_line="$line"
         local keyword="$(compiler.get_keyword "$raw_line")"
@@ -245,10 +255,12 @@ compiler.parse_line() {
                 exit 1
                 ;;
             esac
+    # Remove commented lines
     elif [[ "$line" =~ ^[[:space:]]*"$EC_COMMENT".* ]] ||\
             [[ "$line" =~ ^$ ]]; then
         # Ignore commented and empty lines
         :
+    # Add normal lines to the output
     elif "$output"; then
         echo "$line" >> "$target"
     fi
