@@ -30,6 +30,7 @@ compiler.cleanup() {
         rm "$target"
     fi
 }
+trap compiler.cleanup EXIT SIGINT SIGTERM
 
 ##############################################################################
 
@@ -88,7 +89,6 @@ compiler.compile() {
     cp "$target" "$dest"
     if [ ! "$?" -eq 0 ]; then
         log.fail "Could not write $dest"
-        compiler.cleanup
         exit 1
     fi
 
@@ -120,7 +120,6 @@ compiler.parse_file() {
         local ret="$?"
         if [ "$ret" -eq 1 -o "$ret" -eq 2 ]; then
             compiler.print_error "'if' without matching 'fi'"
-            compiler.cleanup
             exit 1
         fi
     done < "$file"
@@ -176,7 +175,6 @@ compiler.parse_if() {
 
     # Only reached if no FI was encountered
     compiler.print_error "'if' without matching 'fi'"
-    compiler.cleanup
     exit 1
 }
 
@@ -199,7 +197,6 @@ compiler.parse_line() {
                     compiler.parse_file "$file"
                 else
                     compiler.print_error "File not found : '$line'"
-                    compiler.cleanup
                     exit 1
                 fi
                 ;;
@@ -209,7 +206,6 @@ compiler.parse_line() {
                     compiler.parse_file "$file" "raw"
                 else
                     compiler.print_error "File not found : '$line'"
-                    compiler.cleanup
                     exit 1
                 fi
                 ;;
@@ -247,13 +243,11 @@ compiler.parse_line() {
                 msg.print "$file_name: $line"
                 ;;
             fail)
-                msg.print "$line"
-                compiler.cleanup
+                log.warn "Failed to compile: $line"
                 exit 1
                 ;;
             *)
                 compiler.print_error "unknown keyword '$keyword'"
-                compiler.cleanup
                 exit 1
                 ;;
             esac
