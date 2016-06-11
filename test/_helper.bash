@@ -37,7 +37,8 @@ load extension
 
 # Updated ellipsis version if not sufficient (make can't auto update)
 if ! extension.is_compatible; then
-    ./deps/ellipsis/bin/ellipsis update ellipsis > /dev/null 2>&1
+    load ellipsis
+    ellipsis.pull ellipsis > /dev/null 2>&1
 fi
 
 ##############################################################################
