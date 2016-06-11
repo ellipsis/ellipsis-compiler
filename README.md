@@ -37,7 +37,7 @@ If the output file is omitted, `$input-file.out` will be used.
 
 #### Syntax
 Ellipsis-Compiler uses specially formatted comments for its syntax. This will
-preserve syntax highlighting/checks and makes it possible to have files that
+preserve syntax-highlighting/checks and makes it possible to have files that
 also work if they aren't compiled.
 
 By default the `#` symbol is used to indicate comments, but this can be altered

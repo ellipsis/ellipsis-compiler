@@ -14,10 +14,10 @@ EC_PROMPT="${EC_PROMPT:-"_>"}"
 
 ##############################################################################
 
-# Return codes used by line parser
-EC_KW_FI=10
-EC_KW_ELSE=11
-EC_KW_ELIF=12
+# Return codes used by the line parser
+EC_RETURN_FI=10
+EC_RETURN_ELSE=11
+EC_RETURN_ELIF=12
 
 ##############################################################################
 
@@ -26,7 +26,7 @@ compiler.cleanup() {
     unset IFS
 
     # Remove buffer file if it exists
-    if [ -f "$target" ]; then
+    if [ -f "$target" ] && ! utils.is_true "$EC_KEEP_BFR"; then
         rm "$target"
     fi
 }
@@ -79,13 +79,13 @@ compiler.compile() {
     IFS=$'\n'
 
     msg.bold "Compiling $file_name"
-    if [ -z "$EC_NOHEADER" ]; then
+    if ! utils.is_true "$EC_NOHEADER"; then
         echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
     fi
     compiler.parse_file "$file"
 
     # Move temp target to final destination
-    mv "$target" "$dest"
+    cp "$target" "$dest"
     if [ ! "$?" -eq 0 ]; then
         log.fail "Could not write $dest"
         compiler.cleanup
@@ -160,15 +160,15 @@ compiler.parse_if() {
         local ret="$?"
 
         # Handle relevant parser return codes
-        if [ "$ret" -eq "$EC_KW_FI" ]; then
+        if [ "$ret" -eq "$EC_RETURN_FI" ]; then
             return
-        elif [ "$ret" -eq "$EC_KW_ELSE" ] && ! "$ignore_else"; then
+        elif [ "$ret" -eq "$EC_RETURN_ELSE" ] && ! "$ignore_else"; then
             if "$output"; then
                 output=false
             else
                 output=true
             fi
-        elif [ "$ret" -eq "$EC_KW_ELIF" ]; then
+        elif [ "$ret" -eq "$EC_RETURN_ELIF" ]; then
             output=false
             ignore_else=true
         fi
@@ -219,20 +219,20 @@ compiler.parse_line() {
                 ;;
             else)
                 # Return else code to if parser
-                return "$EC_KW_ELSE"
+                return "$EC_RETURN_ELSE"
                 ;;
             elif)
                 # Return elif code to if parser and optionally parse own if
                 if "$output"; then
-                    return "$EC_KW_ELIF"
+                    return "$EC_RETURN_ELIF"
                 else
                     compiler.parse_if "$(compiler.get_condition "$line")"
-                    return "$EC_KW_FI"
+                    return "$EC_RETURN_FI"
                 fi
                 ;;
             fi)
                 # Return fi code to if parser
-                return "$EC_KW_FI"
+                return "$EC_RETURN_FI"
                 ;;
             raw)
                 # Do funky stuff
@@ -261,7 +261,7 @@ compiler.parse_line() {
     elif [[ "$line" =~ ^[[:space:]]*"$EC_COMMENT".* ]] ||\
             [[ "$line" =~ ^$ ]]; then
         # Keep comments if configured
-        if [ -n "$EC_PWS" ]; then
+        if utils.is_true "$EC_KEEP_WS"; then
             echo "$line" >> "$target"
         fi
     # Add normal lines to the output
