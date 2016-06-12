@@ -26,7 +26,7 @@ compiler.cleanup() {
     unset IFS
 
     # Remove buffer file if it exists
-    if [ -f "$target" ] && ! utils.is_true "$EC_KEEP_BFR"; then
+    if [ -f "$target" ] && ! utils.is_true "$EC_KEEP_BUF"; then
         rm "$target"
     fi
 }
@@ -247,7 +247,7 @@ compiler.parse_line() {
                 exit 1
                 ;;
             *)
-                compiler.print_error "unknown keyword '$keyword'"
+                compiler.print_error "Unknown keyword '$keyword'"
                 exit 1
                 ;;
             esac

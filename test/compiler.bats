@@ -6,8 +6,47 @@ load compiler
 
 ##############################################################################
 
+setup() {
+    EC_TMP="/tmp/ellipsis-compiler-test"
+    mkdir -p "$EC_TMP"
+}
+
+teardown() {
+    rm -rf "$EC_TMP"
+}
+
+##############################################################################
+
+@test "compiler.cleanup cleans up after compile" {
+    local target="$EC_TMP/testfile"
+    touch "$target"
+    IFS='test'
+    run compiler.cleanup
+    [ "$status" -eq 0 ]
+    [ ! "$IFS" = $'\n' ]
+    [ ! -f "$target" ]
+}
+
+@test "compiler.cleanup keeps buffer if \$EC_KEEP_BUF is set" {
+    local target="$EC_TMP/testfile"
+    touch "$target"
+    EC_KEEP_BUF=1\
+        run compiler.cleanup
+    [ "$status" -eq 0 ]
+    [ -f "$target" ]
+}
+
 @test "compiler.print_error prints error" {
-    skip "No test implementation"
+    local file="test/file-name"
+    local file_name="file-name"
+    local line_nr=1
+    local raw_line="the troubled line"
+    run compiler.print_error "Error message"
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "Syntax error in 'file-name' at line nr 1:" ]
+    [ "${lines[1]}" = "| test/file-name:1" ]
+    [ "${lines[2]}" = "|    'the troubled line'" ]
+    [ "${lines[3]}" = "> Error message" ]
 }
 
 @test "compiler.get_keyword gets keyword" {
