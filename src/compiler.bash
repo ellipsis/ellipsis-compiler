@@ -12,6 +12,8 @@ load log
 EC_COMMENT="${EC_COMMENT:-"#"}"
 EC_PROMPT="${EC_PROMPT:-"_>"}"
 
+EC_FILE_MODE="644"
+
 ##############################################################################
 
 # Return codes used by the line parser
@@ -91,6 +93,9 @@ compiler.compile() {
         log.fail "Could not write $dest"
         exit 1
     fi
+
+    # Set correct file mode
+    chmod "$EC_FILE_MODE" "$dest"
 
     log.ok "Successfully compiled $file_name"
     compiler.cleanup
