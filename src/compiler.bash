@@ -139,9 +139,10 @@ compiler.parse_file() {
 # Extract the condition from a line
 compiler.get_condition() {
     local cmd="$1"
-    local sed_string="s/^$EC_COMMENT$EC_PROMPT if//;\
-                      s/^$EC_COMMENT$EC_PROMPT elif//;\
-                      s/; then//"
+    local sed_string="s/^$EC_COMMENT$EC_PROMPT if //;\
+                      s/^$EC_COMMENT$EC_PROMPT elif //;\
+                      s/; then//;\
+                      s/;then//"
 
     sed "$sed_string" <<< "$cmd"
 }

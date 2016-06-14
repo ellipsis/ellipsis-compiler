@@ -47,22 +47,29 @@ teardown() {
     [ "${lines[1]}" = "| test/file-name:1" ]
     [ "${lines[2]}" = "|    'the troubled line'" ]
     [ "${lines[3]}" = "> Error message" ]
+
+    local file="test/file-name"
+    local file_name="file-name"
+    local line_nr=1
+    local line="the troubled line"
+    run compiler.print_error "Error message"
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "Syntax error in 'file-name' at line nr 1:" ]
+    [ "${lines[1]}" = "| test/file-name:1" ]
+    [ "${lines[2]}" = "|    'the troubled line'" ]
+    [ "${lines[3]}" = "> Error message" ]
 }
 
 @test "compiler.get_keyword gets keyword" {
-    skip "No test implementation"
+    run compiler.get_keyword "comment key_word other stuff here"
+    [ "$status" -eq 0 ]
+    [ "$output" = "key_word" ]
 }
 
-@test "compiler.get_keyword gets keyword" {
-    skip "No test implementation"
-}
-
-@test "compiler.get_line strips keyword" {
-    skip "No test implementation"
-}
-
-@test "compiler.get_line strips keyword" {
-    skip "No test implementation"
+@test "compiler.get_line gets line (strips keyword)" {
+    run compiler.get_line "comment key_word other stuff here"
+    [ "$status" -eq 0 ]
+    [ "$output" = "other stuff here" ]
 }
 
 @test "compiler.compile compiles a file" {
@@ -78,7 +85,21 @@ teardown() {
 }
 
 @test "compiler.get_condition gets if/elif condition" {
-    skip "No test implementation"
+    run compiler.get_condition "#_> if [ if ]"
+    [ "$status" -eq 0 ]
+    [ "$output" = "[ if ]" ]
+
+    run compiler.get_condition "#_> if if"
+    [ "$status" -eq 0 ]
+    [ "$output" = "if" ]
+
+    run compiler.get_condition "#_> elif [ elif ]"
+    [ "$status" -eq 0 ]
+    [ "$output" = "[ elif ]" ]
+
+    run compiler.get_condition "#_> if [ then ]; then"
+    [ "$status" -eq 0 ]
+    [ "$output" = "[ then ]" ]
 }
 
 @test "compiler.parse_if parses if/elif" {
