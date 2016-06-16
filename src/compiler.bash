@@ -12,7 +12,7 @@ load log
 EC_COMMENT="${EC_COMMENT:-"#"}"
 EC_PROMPT="${EC_PROMPT:-"_>"}"
 
-EC_FILE_MODE="644"
+EC_FILE_MODE="${EC_FILE_MODE:-644}"
 
 ##############################################################################
 
@@ -65,16 +65,15 @@ compiler.get_line() {
 
 ##############################################################################
 
+#@TODO: refactor
 # Compiles a file
 compiler.compile() {
-    local file="$(path.abs_path "$1")"
-    local file_name="$(basename "$file")"
-    if [ -z "$file" ]; then
+    if [ $# -lt 1 ]; then
         msg.print "Please provide an input file"
         exit 1
     fi
-
-    # Target defaults to "$file.out"
+    local file="$(path.abs_path "$1")"
+    local file_name="$(basename "$file")"
     local dest="${2:-${file}.out}"
     local target="$(mktemp "/tmp/ec_${file_name}-XXXXXX")"
 
@@ -83,7 +82,7 @@ compiler.compile() {
 
     msg.bold "Compiling $file_name"
     if ! utils.is_true "$EC_NOHEADER"; then
-        echo "$EC_COMMENT Compiled by Ellipsis-Compiler on $(date)" > "$target"
+        echo "$EC_COMMENT Compiled by Ellipsis-Compiler(v$ELLIPSIS_XVERSION) on $(date)" > "$target"
     fi
     compiler.parse_file "$file"
 
@@ -103,6 +102,7 @@ compiler.compile() {
 
 ##############################################################################
 
+#@TODO: refactor
 # Parse a file
 compiler.parse_file() {
     local file="$1"
@@ -149,6 +149,7 @@ compiler.get_condition() {
 
 ##############################################################################
 
+#@TODO: refactor
 # Parse an IF structure (if, elif)
 compiler.parse_if() {
     if eval "$1"; then
@@ -186,6 +187,7 @@ compiler.parse_if() {
 
 ##############################################################################
 
+#@TODO: refactor
 compiler.parse_line() {
     # Count parsed lines
     let line_nr=line_nr+1
@@ -196,67 +198,92 @@ compiler.parse_line() {
         local keyword="$(compiler.get_keyword "$raw_line")"
         local line="$(compiler.get_line "$raw_line")"
 
-        case $keyword in
-            include)
-                if [ -f "$line" ]; then
-                    local file="$(path.abs_path "$line")"
-                    compiler.parse_file "$file"
-                else
-                    compiler.print_error "File not found : '$line'"
-                    exit 1
-                fi
-                ;;
-            include_raw)
-                if [ -f "$line" ]; then
-                    local file="$(path.abs_path "$line")"
-                    compiler.parse_file "$file" "raw"
-                else
-                    compiler.print_error "File not found : '$line'"
-                    exit 1
-                fi
-                ;;
-            if)
-                # Get condition and parse if
-                compiler.parse_if "$(compiler.get_condition "$line")"
-                ;;
-            else)
-                # Return else code to if parser
-                return "$EC_RETURN_ELSE"
-                ;;
-            elif)
-                # Return elif code to if parser and optionally parse own if
-                if "$output"; then
-                    return "$EC_RETURN_ELIF"
-                else
+        if "$output"; then
+            case $keyword in
+                include)
+                    if [ -f "$line" ]; then
+                        local file="$(path.abs_path "$line")"
+                        compiler.parse_file "$file"
+                    else
+                        compiler.print_error "File not found : '$line'"
+                        exit 1
+                    fi
+                    ;;
+                include_raw)
+                    if [ -f "$line" ]; then
+                        local file="$(path.abs_path "$line")"
+                        compiler.parse_file "$file" "raw"
+                    else
+                        compiler.print_error "File not found : '$line'"
+                        exit 1
+                    fi
+                    ;;
+                if)
+                    # Get condition and parse if
                     compiler.parse_if "$(compiler.get_condition "$line")"
+                    ;;
+                else)
+                    # Return else code to if parser
+                    return "$EC_RETURN_ELSE"
+                    ;;
+                elif)
+                    # Return elif code to if parser and optionally parse own if
+                    if "$output"; then
+                        return "$EC_RETURN_ELIF"
+                    else
+                        compiler.parse_if "$(compiler.get_condition "$line")"
+                        return "$EC_RETURN_FI"
+                    fi
+                    ;;
+                fi)
+                    # Return fi code to if parser
                     return "$EC_RETURN_FI"
-                fi
-                ;;
-            fi)
-                # Return fi code to if parser
-                return "$EC_RETURN_FI"
-                ;;
-            raw)
-                # Do funky stuff
-                eval "$line"
-                ;;
-            \>|write)
-                if "$output"; then
-                    echo "$line" >> "$target"
-                fi
-                ;;
-            msg)
-                msg.print "$file_name: $line"
-                ;;
-            fail)
-                log.warn "Failed to compile: $line"
-                exit 1
-                ;;
-            *)
-                compiler.print_error "Unknown keyword '$keyword'"
-                exit 1
-                ;;
-            esac
+                    ;;
+                raw)
+                    # Do funky stuff
+                    eval "$line"
+                    ;;
+                \>|write)
+                    if "$output"; then
+                        echo "$line" >> "$target"
+                    fi
+                    ;;
+                msg)
+                    msg.print "$file_name: $line"
+                    ;;
+                fail)
+                    log.warn "Failed to compile: $line"
+                    exit 1
+                    ;;
+                *)
+                    compiler.print_error "Unknown keyword '$keyword'"
+                    exit 1
+                    ;;
+                esac
+        else
+            case $keyword in
+                else)
+                    # Return else code to if parser
+                    return "$EC_RETURN_ELSE"
+                    ;;
+                elif)
+                    # Return elif code to if parser and optionally parse own if
+                    if "$output"; then
+                        return "$EC_RETURN_ELIF"
+                    else
+                        compiler.parse_if "$(compiler.get_condition "$line")"
+                        return "$EC_RETURN_FI"
+                    fi
+                    ;;
+                fi)
+                    # Return fi code to if parser
+                    return "$EC_RETURN_FI"
+                    ;;
+                *)
+                    : # Nothing to be done
+                    ;;
+                esac
+        fi
     # Remove commented lines
     elif [[ "$line" =~ ^[[:space:]]*"$EC_COMMENT".* ]] ||\
             [[ "$line" =~ ^$ ]]; then
