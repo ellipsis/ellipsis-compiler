@@ -201,20 +201,20 @@ compiler.parse_line() {
         if "$output"; then
             case $keyword in
                 include)
-                    if [ -f "$line" ]; then
-                        local file="$(path.abs_path "$line")"
+                    local file="$(path.abs_path "$line")"
+                    if [ -f "$file" ]; then
                         compiler.parse_file "$file"
                     else
-                        compiler.print_error "File not found : '$line'"
+                        compiler.print_error "File not found : '$file'"
                         exit 1
                     fi
                     ;;
                 include_raw)
-                    if [ -f "$line" ]; then
-                        local file="$(path.abs_path "$line")"
+                    local file="$(path.abs_path "$line")"
+                    if [ -f "$file" ]; then
                         compiler.parse_file "$file" "raw"
                     else
-                        compiler.print_error "File not found : '$line'"
+                        compiler.print_error "File not found : '$file'"
                         exit 1
                     fi
                     ;;
