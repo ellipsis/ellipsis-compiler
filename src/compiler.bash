@@ -72,7 +72,8 @@ compiler.compile() {
         msg.print "Please provide an input file"
         exit 1
     fi
-    local file="$(path.abs_path "$1")"
+    local file="$(path.expand "$1")"
+    file="$(path.abs_path "$file")"
     local file_name="$(basename "$file")"
     local dest="${2:-${file}.out}"
     local target="$(mktemp "/tmp/ec_${file_name}-XXXXXX")"
@@ -201,7 +202,8 @@ compiler.parse_line() {
         if "$output"; then
             case $keyword in
                 include)
-                    local file="$(path.abs_path "$line")"
+                    local file="$(path.expand "$line")"
+                    file="$(path.abs_path "$file")"
                     if [ -f "$file" ]; then
                         compiler.parse_file "$file"
                     else
@@ -210,7 +212,8 @@ compiler.parse_line() {
                     fi
                     ;;
                 include_raw)
-                    local file="$(path.abs_path "$line")"
+                    local file="$(path.expand "$line")"
+                    file="$(path.abs_path "$file")"
                     if [ -f "$file" ]; then
                         compiler.parse_file "$file" "raw"
                     else
