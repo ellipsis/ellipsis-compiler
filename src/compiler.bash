@@ -12,7 +12,7 @@ load log
 EC_COMMENT="${EC_COMMENT:-"#"}"
 EC_PROMPT="${EC_PROMPT:-"_>"}"
 
-EC_FILE_MODE="${EC_FILE_MODE:-644}"
+EC_MODE="${EC_MODE:-644}"
 
 ##############################################################################
 
@@ -95,7 +95,7 @@ compiler.compile() {
     fi
 
     # Set correct file mode
-    chmod "$EC_FILE_MODE" "$dest"
+    chmod "$EC_MODE" "$dest"
 
     log.ok "Successfully compiled $file_name"
     compiler.cleanup
@@ -281,6 +281,11 @@ compiler.parse_line() {
                 fi)
                     # Return fi code to if parser
                     return "$EC_RETURN_FI"
+                    ;;
+                mode)
+                    # Set the file mode
+                    EC_MODE="$line"
+                    :
                     ;;
                 *)
                     : # Nothing to be done
