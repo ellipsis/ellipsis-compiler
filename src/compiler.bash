@@ -258,6 +258,10 @@ compiler.parse_line() {
                     log.warn "Failed to compile: $line"
                     exit 1
                     ;;
+                mode)
+                    # Set the file mode
+                    EC_MODE="$line"
+                    ;;
                 *)
                     compiler.print_error "Unknown keyword '$keyword'"
                     exit 1
@@ -281,11 +285,6 @@ compiler.parse_line() {
                 fi)
                     # Return fi code to if parser
                     return "$EC_RETURN_FI"
-                    ;;
-                mode)
-                    # Set the file mode
-                    EC_MODE="$line"
-                    :
                     ;;
                 *)
                     : # Nothing to be done
