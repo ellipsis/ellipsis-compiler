@@ -65,7 +65,6 @@ compiler.get_line() {
 
 ##############################################################################
 
-#@TODO: refactor
 # Compiles a file
 compiler.compile() {
     if [ $# -lt 1 ]; then
@@ -103,7 +102,6 @@ compiler.compile() {
 
 ##############################################################################
 
-#@TODO: refactor
 # Parse a file
 compiler.parse_file() {
     local file="$1"
@@ -112,6 +110,15 @@ compiler.parse_file() {
     # Keep pwd and line_nr
     local cwd="$(pwd)"
     local tmp_line_nr="$line_nr"
+
+    # Expand to full file path
+    file="$(path.expand "$file")"
+    file="$(path.abs_path "$file")"
+
+    if [ ! -f "$file" ]; then
+        compiler.print_error "File not found : '$file'"
+        exit 1
+    fi
 
     # Run in correct folder (relative file support)
     cd "$(dirname "$file")"
@@ -124,8 +131,10 @@ compiler.parse_file() {
         local output=true
         compiler.parse_line "$line"
         local ret="$?"
-        if [ "$ret" -eq 1 -o "$ret" -eq 2 ]; then
-            compiler.print_error "'if' without matching 'fi'"
+        # else, elif and fi not returned unles an if statement is missing
+        if [ "$ret" -eq "$EC_RETURN_FI" -o "$ret" -eq $EC_RETURN_ELSE -o
+             "$ret" -eq $EC_RETURN_ELIF ]; then
+            compiler.print_error "Missing 'if' statement"
             exit 1
         fi
     done < "$file"
@@ -150,7 +159,6 @@ compiler.get_condition() {
 
 ##############################################################################
 
-#@TODO: refactor
 # Parse an IF structure (if, elif)
 compiler.parse_if() {
     if eval "$1"; then
@@ -188,7 +196,6 @@ compiler.parse_if() {
 
 ##############################################################################
 
-#@TODO: refactor
 compiler.parse_line() {
     # Count parsed lines
     let line_nr=line_nr+1
@@ -202,24 +209,10 @@ compiler.parse_line() {
         if "$output"; then
             case $keyword in
                 include)
-                    local file="$(path.expand "$line")"
-                    file="$(path.abs_path "$file")"
-                    if [ -f "$file" ]; then
-                        compiler.parse_file "$file"
-                    else
-                        compiler.print_error "File not found : '$file'"
-                        exit 1
-                    fi
+                    compiler.parse_file "$line"
                     ;;
                 include_raw)
-                    local file="$(path.expand "$line")"
-                    file="$(path.abs_path "$file")"
-                    if [ -f "$file" ]; then
-                        compiler.parse_file "$file" "raw"
-                    else
-                        compiler.print_error "File not found : '$file'"
-                        exit 1
-                    fi
+                    compiler.parse_file "$line" "raw"
                     ;;
                 if)
                     # Get condition and parse if
