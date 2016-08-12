@@ -132,7 +132,7 @@ compiler.parse_file() {
         compiler.parse_line "$line"
         local ret="$?"
         # else, elif and fi not returned unles an if statement is missing
-        if [ "$ret" -eq "$EC_RETURN_FI" -o "$ret" -eq $EC_RETURN_ELSE -o
+        if [ "$ret" -eq "$EC_RETURN_FI" -o "$ret" -eq $EC_RETURN_ELSE -o \
              "$ret" -eq $EC_RETURN_ELIF ]; then
             compiler.print_error "Missing 'if' statement"
             exit 1
