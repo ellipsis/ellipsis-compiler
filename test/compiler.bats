@@ -40,18 +40,20 @@ teardown() {
     local file="test/file-name"
     local file_name="file-name"
     local line_nr=1
-    local raw_line="the troubled line"
+    local line="the troubled line"
     run compiler.print_error "Error message"
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "Syntax error in 'file-name' at line nr 1:" ]
     [ "${lines[1]}" = "| test/file-name:1" ]
     [ "${lines[2]}" = "|    'the troubled line'" ]
     [ "${lines[3]}" = "> Error message" ]
+}
 
+@test "compiler.print_error prints error (raw_line)" {
     local file="test/file-name"
     local file_name="file-name"
     local line_nr=1
-    local line="the troubled line"
+    local raw_line="the troubled line"
     run compiler.print_error "Error message"
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "Syntax error in 'file-name' at line nr 1:" ]
@@ -108,6 +110,14 @@ teardown() {
 
 @test "compiler.parse_line parses a line" {
     skip "No test implementation"
+}
+
+# Test by compiling a file with known output
+@test "compiler input-output test 1 (empty file)" {
+    EC_NOHEADER=true \
+        run compiler.compile "$TESTS_DIR/fixtures/input1.econf" "$EC_TMP/output1"
+    [ "$status" -eq 0 ]
+    [ "$(diff "$TESTS_DIR/fixtures/output1" "$EC_TMP/output1")" = "" ]
 }
 
 ##############################################################################
