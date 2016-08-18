@@ -74,6 +74,12 @@ teardown() {
     [ "$output" = "other stuff here" ]
 }
 
+@test "compiler.parse_file fails on a non existing file" {
+    run compiler.parse_file "$EC_TMP/doesnotexist.econf"
+    [ "$status" -eq 1 ]
+    [ "${lines[3]}" = "> File not found : '/tmp/ellipsis-compiler-test/doesnotexist.econf'" ]
+}
+
 @test "compiler.compile compiles a file" {
     skip "No test implementation"
 }

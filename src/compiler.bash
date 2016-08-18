@@ -41,8 +41,9 @@ trap compiler.cleanup EXIT SIGINT SIGTERM
 # expects $file, $line_nr and $raw_line or $line to be set
 compiler.print_error() {
     local err_msg="$1"
+    local err_type="${2:-"Syntax error"}"
 
-    msg.print "Syntax error in '$file_name' at line nr $line_nr:"
+    msg.print "$err_type in '$file_name' at line nr $line_nr:"
     msg.print "| $file:$line_nr"
     msg.print "|    '${raw_line:-$line}'"
     if [ -n "$err_msg" ]; then
@@ -112,14 +113,16 @@ compiler.parse_file() {
     local cwd="$(pwd)"
     local tmp_line_nr="$line_nr"
 
-    # Expand to full file path
+    # Expand '~' and '$HOME'
     file="$(path.expand "$file")"
-    file="$(path.abs_path "$file")"
 
     if [ ! -f "$file" ]; then
-        compiler.print_error "File not found : '$file'"
+        compiler.print_error "File not found : '$file'" "File error"
         exit 1
     fi
+
+    # Expand to full file path
+    file="$(path.abs_path "$file")"
 
     # Run in correct folder (relative file support)
     cd "$(dirname "$file")"
