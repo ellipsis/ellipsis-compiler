@@ -1,0 +1,5 @@
+#_> if false
+"include not ok"
+#_> else
+"include ok"
+#_> fi

@@ -127,4 +127,12 @@ teardown() {
     [ "$(diff "$TESTS_DIR/fixtures/output2" "$EC_TMP/output2")" = "" ]
 }
 
+@test "compiler input-output test 3 (include/include_raw)" {
+    cp "$TESTS_DIR/fixtures/input3.p3.econf" "$EC_TMP"
+    EC_NOHEADER=true \
+        run compiler.compile "$TESTS_DIR/fixtures/input3.econf" "$EC_TMP/output3"
+    [ "$status" -eq 0 ]
+    [ "$(diff "$TESTS_DIR/fixtures/output3" "$EC_TMP/output3")" = "" ]
+}
+
 ##############################################################################

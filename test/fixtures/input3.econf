@@ -1,0 +1,10 @@
+# File include tests
+
+"original file pre include ok"
+
+#_> include input3.p1.econf
+#_> include_raw input3.p2.econf
+
+#_> include_raw /tmp/ellipsis-compiler-test/input3.p3.econf
+
+"original file post include ok"

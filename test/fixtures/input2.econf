@@ -1,4 +1,4 @@
-# This header should be copiled or removed according to the settings
+# If/elif/else statemenet tests
 
 #_> if true; then
 "if 1 ok"
