@@ -1,0 +1,46 @@
+# This header should be copiled or removed according to the settings
+
+#_> if true; then
+"if 1 ok"
+#_> fi
+
+#_> if true;then
+"if 2 ok"
+#_> fi
+
+#_> if true
+"if 3 ok"
+#_> fi
+
+#_> if false
+"if 4 not ok"
+#_> fi
+
+#_> if true
+"if 5 ok"
+#_> else
+"if 5 not ok"
+#_> fi
+
+#_> if false
+"if 6 not ok"
+#_> else
+"if 6 ok"
+#_> fi
+
+#_> if false
+"if 7 not ok"
+#_> elseif false
+"if 7 not ok"
+#_> else
+"if 7 ok"
+#_> fi
+
+#_> if false
+"if 8 not ok"
+#_> elif true
+"if 8 ok"
+#_> else
+"if 8 not ok"
+#_> fi
+

@@ -202,8 +202,9 @@ compiler.parse_line() {
     let line_nr=line_nr+1
 
     # Parse line if raw is not set
-    if [ -z "$raw" ] && [[ "$line" =~ ^"$EC_COMMENT"[[:space:]]*"$EC_PROMPT".* ]]; then
-        local raw_line="$line"
+    if [ -z "$raw" ] && [[ "$line" =~ ^[[:space:]]*"$EC_COMMENT"[[:space:]]*"$EC_PROMPT".* ]]; then
+        # Also strip leading whitespace
+        local raw_line="$(echo -e "$line" | sed -e 's/^[[:space:]]*//')"
         local keyword="$(compiler.get_keyword "$raw_line")"
         local line="$(compiler.get_line "$raw_line")"
 

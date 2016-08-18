@@ -120,4 +120,11 @@ teardown() {
     [ "$(diff "$TESTS_DIR/fixtures/output1" "$EC_TMP/output1")" = "" ]
 }
 
+@test "compiler input-output test 2 (if/elif/else statements)" {
+    EC_NOHEADER=true \
+        run compiler.compile "$TESTS_DIR/fixtures/input2.econf" "$EC_TMP/output2"
+    [ "$status" -eq 0 ]
+    [ "$(diff "$TESTS_DIR/fixtures/output2" "$EC_TMP/output2")" = "" ]
+}
+
 ##############################################################################
