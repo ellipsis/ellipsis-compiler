@@ -29,18 +29,57 @@
 #_> fi
 
 #_> if false
-"if 7 not ok"
+"if 7 not ok (1)"
 #_> elseif false
-"if 7 not ok"
+"if 7 not ok (2)"
 #_> else
 "if 7 ok"
 #_> fi
 
 #_> if false
-"if 8 not ok"
+"if 8 not ok (1)"
 #_> elif true
 "if 8 ok"
 #_> else
-"if 8 not ok"
+"if 8 not ok (2)"
 #_> fi
 
+#_> if true
+    #_> if true
+    "if 9 ok"
+    #_> else
+    "if 9 not ok (1)"
+    #_> fi
+#_> else
+"if 9 not ok (2)"
+#_> fi
+
+#_> if true
+    #_> if false
+    "if 10 not ok (1)"
+    #_> else
+    "if 10 ok"
+    #_> fi
+#_> else
+"if 10 not ok (2)"
+#_> fi
+
+#_> if false
+"if 11 not ok (1)"
+#_> else
+    #_> if true
+    "if 11 ok"
+    #_> else
+    "if 11 not ok (2)"
+    #_> fi
+#_> fi
+
+#_> if false
+"if 12 not ok (1)"
+#_> else
+    #_> if false
+    "if 12 not ok (2)"
+    #_> else
+    "if 12 ok"
+    #_> fi
+#_> fi

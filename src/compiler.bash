@@ -180,7 +180,8 @@ compiler.parse_if() {
 
         # Handle relevant parser return codes
         if [ "$ret" -eq "$EC_RETURN_FI" ]; then
-            return
+            output=true
+            return 0
         elif [ "$ret" -eq "$EC_RETURN_ELSE" ] && ! "$ignore_else"; then
             if "$output"; then
                 output=false
