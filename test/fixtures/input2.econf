@@ -83,3 +83,29 @@
     "if 12 ok"
     #_> fi
 #_> fi
+
+#_> if false
+"if 13 not ok (1)"
+#_> elif true
+"if 13 ok"
+#_> else
+"if 13 not ok (2)"
+#_> fi
+
+#_> if false
+"if 14 not ok (1)"
+#_> elif false
+"if 14 not ok (2)"
+#_> else
+"if 14 ok"
+#_> fi
+
+#_> if false
+"if 15 not ok (1)"
+#_> elif false
+"if 15 not ok (2)"
+#_> elif false
+"if 15 not ok (3)"
+#_> else
+"if 15 ok"
+#_> fi
