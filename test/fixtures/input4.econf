@@ -1,0 +1,5 @@
+# Raw statemenet tests
+
+#_> raw echo '"test 1 not ok"'
+
+#_> raw echo '"test 2 ok"' >> $target

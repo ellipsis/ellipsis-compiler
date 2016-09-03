@@ -141,4 +141,25 @@ teardown() {
     [ "$(diff "$TESTS_DIR/fixtures/output3" "$EC_TMP/output3")" = "" ]
 }
 
+@test "compiler input-output test 4 (raw)" {
+    EC_NOHEADER=true \
+        run compiler.compile "$TESTS_DIR/fixtures/input4.econf" "$EC_TMP/output4"
+    [ "$status" -eq 0 ]
+    [ "$(diff "$TESTS_DIR/fixtures/output4" "$EC_TMP/output4")" = "" ]
+}
+
+@test "compiler input-output test 5 (write)" {
+    EC_NOHEADER=true \
+        run compiler.compile "$TESTS_DIR/fixtures/input5.econf" "$EC_TMP/output5"
+    [ "$status" -eq 0 ]
+    [ "$(diff "$TESTS_DIR/fixtures/output5" "$EC_TMP/output5")" = "" ]
+}
+
+@test "compiler input-output test 6 (compiler control)" {
+    EC_NOHEADER=true \
+        run compiler.compile "$TESTS_DIR/fixtures/input6.econf" "$EC_TMP/output6"
+    [ "$status" -eq 0 ]
+    [ "$(diff "$TESTS_DIR/fixtures/output6" "$EC_TMP/output6")" = "" ]
+}
+
 ##############################################################################
