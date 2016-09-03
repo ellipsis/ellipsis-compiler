@@ -2,14 +2,18 @@
 
 Configuration file compiler
 
-**Warning: This project is in an early alpha stage. Use at own risk!**
-
 Ellipsis-Compiler is a compiler for configuration files. It makes it possible
 to use logic in any config file. This allows you to make dynamic
 configurations, even if this is normally not supported.
 
 ### Features
-- ...
+- Create dynamic and smart configuration files
+- Supports virtualy all types of config files
+- Addapts to your needs
+- Does not break syntax highlighting/checking
+- Cleans up existing config files
+- Verry portable
+- Ellipsis integration
 
 ### Install
 
@@ -52,8 +56,8 @@ Include a file, or include a file without processing (include_raw).
 #_> include test_file.econf
 #_> include_raw raw_config.conf
 ```
-Output will include the processed content of `test_file.conf` and the raw content
-of `raw_config.conf`.
+Output will include the processed content of `test_file.econf` and the raw
+content of `raw_config.conf`.
 
 ##### if (then, else, elif)
 Use the if,then,else/elif construction to alter compilation output. The test
