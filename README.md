@@ -45,16 +45,11 @@ by setting the `$EC_COMMENT` variable. Lines that need to be interpreted by the
 compiler are indicated with a prompt like string `_>`. This string can be
 altered by setting the `$EC_PROMPT` variable.
 
-###### Example
-```bash
-# TODO
-```
-
 ##### include (include_raw)
 Include a file, or include a file without processing (include_raw).
 
 ```bash
-#_> include test_file.conf
+#_> include test_file.econf
 #_> include_raw raw_config.conf
 ```
 Output will include the processed content of `test_file.conf` and the raw content
@@ -83,7 +78,7 @@ feature or submit an issue.
 
 ```bash
 ## Use the current kernel number in your config file
-#_> raw echo "config.kernel=$(uname -r)" > "$target"
+#_> raw echo "config.kernel=$(uname -r)" >> "$target"
 ```
 
 ##### write (>)
@@ -122,11 +117,17 @@ Stop compilation and display the given message.
 #_> fi
 ```
 
-### Docs
-Please consult the [docs][docs-url] for more information.
+##### mode
+Change the default file mode. The last encountered mode setting will be used.
+The mode can still be forced at compile time using the `$EC_MODE` variable.
 
-Specific parts that could be off interest:
-- ...
+```bash
+## Write the file as executable
+#_> mode 755
+
+## Four digit modes are also allowed
+#_> mode 0755
+```
 
 ### Development
 Pull requests welcome! New code should follow the [existing style][style-guide]

@@ -13,7 +13,8 @@ load path
 EC_COMMENT="${EC_COMMENT:-"#"}"
 EC_PROMPT="${EC_PROMPT:-"_>"}"
 
-EC_MODE="${EC_MODE:-644}"
+# Default mode, overwritten by 'mode' option and EC_MODE variable
+EC_DMODE="644"
 
 ##############################################################################
 
@@ -96,7 +97,7 @@ compiler.compile() {
     fi
 
     # Set correct file mode
-    chmod "$EC_MODE" "$dest"
+    chmod "${EC_MODE:-$EC_DMODE}" "$dest"
 
     log.ok "Successfully compiled $file_name"
     compiler.cleanup
@@ -259,7 +260,7 @@ compiler.parse_line() {
                     ;;
                 mode)
                     # Set the file mode
-                    EC_MODE="$line"
+                    EC_DMODE="$line"
                     ;;
                 *)
                     compiler.print_error "Unknown keyword '$keyword'"
