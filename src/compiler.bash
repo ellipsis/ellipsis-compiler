@@ -25,9 +25,12 @@ EC_RETURN_ELIF=12
 
 ##############################################################################
 
+# Keep current IFS for cleanup
+EC_CIFS="$IFS"
+
 compiler.cleanup() {
-    # Reset IFS to default
-    unset IFS
+    # Restore original IFS
+    IFS="$EC_CIFS"
 
     # Remove buffer file if it exists
     if [ -f "$target" ] && ! utils.is_true "$EC_KEEP_BUF"; then
@@ -255,8 +258,11 @@ compiler.parse_line() {
                     msg.print "$file_name: $line"
                     ;;
                 fail)
-                    log.warn "Failed to compile: $line"
+                    log.fail "$line"
                     exit 1
+                    ;;
+                warn)
+                    log.warn "$line"
                     ;;
                 mode)
                     # Set the file mode
