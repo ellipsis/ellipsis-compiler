@@ -110,12 +110,24 @@ Print a message to stdout, to inform a user about something.
 ```
 
 ##### fail
-Stop compilation and display the given message.
+Stop compilation, log and display the given message.
 
 ```bash
-## If test_file exists it is used in hte config, else compilation will fail
+## If test_file exists it is used in the config, else compilation will fail
 #_> if [ ! -f test_file ]; then
-#_>     fail Could not compile!
+#_>     fail Could not compile, 'test_file' missing!
+#_> else
+        conf.settings=test_file
+#_> fi
+```
+
+##### warn
+Show and log a warning message.
+
+```bash
+## If test_file exists it is used in the config, else a warning will be shown
+#_> if [ ! -f test_file ]; then
+#_>     warn 'conf.settings' not set, 'test_file' not available.
 #_> else
         conf.settings=test_file
 #_> fi
